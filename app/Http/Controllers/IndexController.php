@@ -28,6 +28,14 @@ class IndexController extends Controller
     {
         $post = $request->post();
         if (isset($post['url'])) {
+
+        }
+    }
+
+    public function shortUrl(Request $request)
+    {
+        $post = $request->post();
+        if (isset($post['url'])) {
             
         }
     }
