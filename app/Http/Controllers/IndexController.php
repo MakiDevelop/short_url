@@ -2,15 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\UrlShortenerRepository;
+use App\Services\HtmlParserService;
 use Illuminate\Http\Request;
 use PHPHtmlParser\Dom;
 
 class IndexController extends Controller
 {
     protected $client;
-    public function __construct()
+    protected $htmlService;
+    protected $urlRepository;
+    public function __construct(HtmlParserService $htmlService, UrlShortenerRepository $urlRepository)
     {
-        $this->client = new \GuzzleHttp\Client();
+        $this->client        = new \GuzzleHttp\Client();
+        $this->htmlService   = $htmlService;
+        $this->urlRepository = $urlRepository;
     }
 
     public function index()
@@ -18,26 +24,47 @@ class IndexController extends Controller
         return view('index');
     }
 
-    public function test()
+    public function urlData($code)
     {
-        $url  = 'https://www.apple.com/tw/';
-        $this->getWebsite($url);
+        var_dump($code);
     }
 
-    public function checkUrl(Request $request)
+    public function test()
     {
-        $post = $request->post();
-        if (isset($post['url'])) {
+        $url = 'https://www.apple.com/tw/';
+        // $this->getWebsite($url);
+        $metaDatas = $this->htmlService->metaData($url, config('common.metaProperty'));
+        var_dump($metaDatas);
+        $code = $this->urlRepository->generateCode();
+        var_dump($code);
 
-        }
+        var_dump(url($code));
     }
 
     public function shortUrl(Request $request)
     {
+        $response = [
+            'success' => false,
+        ];
         $post = $request->post();
         if (isset($post['url'])) {
-            
+            $code       = $this->urlRepository->generateCode();
+            $metaDatas  = $this->htmlService->metaData($url, config('common.metaProperty'));
+            $insertData = [
+                'original_url' => $post['url'],
+                'short_url'    => $code,
+                'gacode_id'    => '',
+                'fbpixel_id'   => '',
+                'hashtag'      => '',
+            ];
+            $urlData  = $this->urlRepository->insert($inserData);
+            $response = [
+                'success'   => true,
+                'code'      => $code,
+                'short_url' => url($code),
+            ];
         }
+        return response()->json($response);
     }
 
     protected function getWebsite($url)
@@ -49,32 +76,29 @@ class IndexController extends Controller
         echo $response->getHeaderLine('content-type'); // 'application/json; charset=utf8'
         echo $response->getBody();
 
-        
         try {
             var_dump('iun here');
-
 
             $tags = get_meta_tags($url);
             var_dump($tags);
 
-
             echo '<br />=====================<br />';
 
             $html = file_get_contents($url);
-            $dom = new Dom;
+            $dom  = new Dom;
             $dom->load($html);
             $metas = $dom->find('meta');
-            foreach  ($metas as $meta) {
+            foreach ($metas as $meta) {
                 var_dump($meta->property);
                 var_dump($meta->content);
                 echo '<br />=====================<br />';
             }
-            
+
         } catch (\Exception $e) {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
+            echo 'Caught exception: ', $e->getMessage(), "\n";
         } finally {
             echo "First finally.\n";
         }
-        
+
     }
 }
