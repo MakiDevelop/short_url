@@ -26,7 +26,11 @@ class IndexController extends Controller
 
     public function urlData($code)
     {
-        var_dump($code);
+        $data = $this->urlRepository->getByCode($code);
+        if ($data) {
+            return view('url', compact('data'));
+        }
+        return redirect('/');
     }
 
     public function test()
@@ -39,6 +43,15 @@ class IndexController extends Controller
         var_dump($code);
 
         var_dump(url($code));
+
+        $insertData = [
+            'original_url' => $url,
+            'short_url'    => $code,
+            'gacode_id'    => '',
+            'fbpixel_id'   => '',
+            'hashtag'      => '',
+        ];
+
     }
 
     public function shortUrl(Request $request)
@@ -49,15 +62,16 @@ class IndexController extends Controller
         $post = $request->post();
         if (isset($post['url'])) {
             $code       = $this->urlRepository->generateCode();
-            $metaDatas  = $this->htmlService->metaData($url, config('common.metaProperty'));
-            $insertData = [
+            $metaDatas  = $this->htmlService->metaData($post['url'], config('common.metaProperty'));
+            $tmpData = [
                 'original_url' => $post['url'],
                 'short_url'    => $code,
                 'gacode_id'    => '',
                 'fbpixel_id'   => '',
                 'hashtag'      => '',
             ];
-            $urlData  = $this->urlRepository->insert($inserData);
+            $insertData = array_merge($tmpData, $metaDatas);
+            $urlData  = $this->urlRepository->insert($insertData);
             $response = [
                 'success'   => true,
                 'code'      => $code,

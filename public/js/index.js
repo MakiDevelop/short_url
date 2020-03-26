@@ -11,7 +11,20 @@ $(function () {
         }
     });
     $('#send').click(function(){
-        
+        var url = '/index/short_url',
+            method = 'POST',
+            data = $('form').serialize(),
+            callbackSuccess = function (response) {
+                console.log(response);
+                if ($('#error_alert').is(':visible')) {
+                    $('#error_alert').attr('hidden', 'hidden');
+                }
+                
+                if ($('#send').length > 0) {
+					$('#send').prop('disabled', false);
+				}
+            };
+        App.ajax(url, method, data, callbackSuccess);
     });
 });
 function isUrl(s) {
