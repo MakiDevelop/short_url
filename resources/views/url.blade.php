@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        
         <meta http-equiv="refresh" content="1;url={{$data->original_url}}"" />
         <title>Laravel</title>
 
