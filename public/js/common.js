@@ -37,14 +37,12 @@ var App = {
 			},
 			success: callbackSuccess,
 			beforeSend: function () {
-				if ($('#save').length > 0) {
-					$('#save').prop('disabled', true);
+				if ($('#send').length > 0) {
+					$('#send').prop('disabled', true);
 				}
 			},
 			error: function(response) {
-				// console.log('in error');
-				// console.log(response);
-				// console.log(response.responseJSON);
+				
 				if (response.status == 422) {
 					$('#error_alert').html(response.responseJSON.msg);
 					$('#error_alert').removeAttr('hidden');
@@ -58,8 +56,8 @@ var App = {
 						location.href = '/admin';
 					});
 				}
-				if ($('#save').length > 0) {
-					$('#save').prop('disabled', false);
+				if ($('#send').length > 0) {
+					$('#send').prop('disabled', false);
 				}
 			},
 			done: function(response){

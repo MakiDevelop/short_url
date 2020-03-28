@@ -22,7 +22,7 @@
                     <button type="button" id="qrcode" class="btn btn-primary" data-toggle="collapse" data-target="#collapseQRCode" aria-expanded="false" aria-controls="collapseQRCode">QRCode</button>
                 </div>
             </div>
-            <div class="col-sm-12 collapse" id="collapseQRCode">
+            <div class="col-sm-12 text-center collapse" id="collapseQRCode">
 
             </div>
         </div>

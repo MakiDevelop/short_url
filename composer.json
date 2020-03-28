@@ -13,7 +13,8 @@
         "guzzlehttp/guzzle": "^6.5",
         "laravel/framework": "5.8.*",
         "laravel/tinker": "^1.0",
-        "paquettg/php-html-parser": "^2.2"
+        "paquettg/php-html-parser": "^2.2",
+        "sinergi/browser-detector": "^6.1"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
