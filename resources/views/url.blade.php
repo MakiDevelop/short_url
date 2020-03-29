@@ -7,6 +7,10 @@
         <meta http-equiv="refresh" content="1;url={{$data->original_url}}"" />
         <title>Laravel</title>
 
+        <meta property="og:title" content="{{ $data->og_title }}">
+        <meta property="og:description" content="{{ $data->og_description }}">
+        <meta property="og:image" content="{{ $data->og_image }}">
+
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
 
