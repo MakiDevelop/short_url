@@ -21,7 +21,7 @@ Route::post('/index/short_url', 'IndexController@shortUrl');
 
 Route::get('/login', 'LoginController@index');
 Route::get('/login/facebook', 'LoginController@facebook');
-Route::get('/login/facebook_callback', 'LoginController@facebookCallback');
+Route::get('/login/facebook_back', 'LoginController@facebookBack');
 Route::get('/login/facebook_cancel', 'LoginController@facebookCancel');
 
 Route::get('/policies/privacy', 'PoliciesController@privacy');

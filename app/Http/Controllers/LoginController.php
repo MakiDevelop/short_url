@@ -27,12 +27,24 @@ class LoginController extends Controller
         return Socialite::driver('facebook')->redirect();
     }
 
-    public function facebookCallback()
+    public function facebookBack()
+    {
+        $user = Socialite::driver('facebook')->user();
+        var_dump($user->name);
+        dd($user);
+    }
+
+    public function facebookCancel()
     {
 
     }
-    
-    public function facebookCancel()
+
+    public function google()
+    {
+
+    }
+
+    public function googleBack()
     {
 
     }
