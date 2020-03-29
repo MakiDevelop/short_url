@@ -17,12 +17,22 @@ class LoginController extends Controller
         echo 'test';
     }
 
+    public function index()
+    {
+        return view('login');
+    }
+
     public function facebook()
     {
         return Socialite::driver('facebook')->redirect();
     }
 
     public function facebookCallback()
+    {
+
+    }
+    
+    public function facebookCancel()
     {
 
     }
