@@ -34,6 +34,17 @@ class LoginController extends Controller
         dd($user);
     }
 
+    public function google()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function googleBack()
+    {
+        $user = Socialite::driver('google')->user();
+        var_dump($user);
+    }
+
     public function facebookCancel()
     {
 

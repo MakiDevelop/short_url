@@ -24,6 +24,9 @@ Route::get('/login/facebook', 'LoginController@facebook');
 Route::get('/login/facebook_back', 'LoginController@facebookBack');
 Route::get('/login/facebook_cancel', 'LoginController@facebookCancel');
 
+Route::get('/login/google', 'LoginController@google');
+Route::get('/login/google_back', 'LoginController@googleBack');
+
 Route::get('/policies/privacy', 'PoliciesController@privacy');
 Route::get('/policies/terms', 'PoliciesController@terms');
 
