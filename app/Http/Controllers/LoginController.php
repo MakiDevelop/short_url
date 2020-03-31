@@ -34,6 +34,11 @@ class LoginController extends Controller
         dd($user);
     }
 
+    public function facebookCancel()
+    {
+
+    }
+
     public function google()
     {
         return Socialite::driver('google')->redirect();
@@ -43,20 +48,5 @@ class LoginController extends Controller
     {
         $user = Socialite::driver('google')->user();
         var_dump($user);
-    }
-
-    public function facebookCancel()
-    {
-
-    }
-
-    public function google()
-    {
-
-    }
-
-    public function googleBack()
-    {
-
     }
 }
