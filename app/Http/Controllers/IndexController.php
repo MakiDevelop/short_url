@@ -8,6 +8,7 @@ use App\Services\HtmlParserService;
 use Illuminate\Http\Request;
 use Sinergi\BrowserDetector\Browser;
 use Sinergi\BrowserDetector\Os;
+use Auth;
 
 class IndexController extends Controller
 {
@@ -24,6 +25,10 @@ class IndexController extends Controller
 
     public function index()
     {
+        if (Auth::id()) {
+            
+            exit;
+        }
         return view('index');
     }
 

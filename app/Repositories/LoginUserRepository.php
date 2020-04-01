@@ -17,4 +17,9 @@ class LoginUserRepository extends BaseRepository
     {
         // return $this->model->paginate(config('constants.per_page'));
     }
+
+    public function getByOauthID($oauthType, $oauthID)
+    {
+        return $this->model->where('oauth_type', $oauthType)->where('oauth_id', $oauthID)->first();
+    }
 }
