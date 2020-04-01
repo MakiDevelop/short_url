@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Socialite;
 
@@ -34,11 +35,15 @@ class LoginController extends Controller
     public function oauthBack($type = '')
     {
         if (in_array($type, config('common.socialTypes'))){
-            $user = Socialite::driver($type)->user();
-            var_dump($user->name);
-            var_dump($user->id);
-            var_dump($user->email);
-            dd($user);
+            try {
+                $user = Socialite::driver($type)->user();
+                var_dump($user->name);
+                var_dump($user->id);
+                var_dump($user->email);
+                dd($user);
+            } catch(Exception $e) {
+
+            }
         }
         return redirect('/');
     }
