@@ -6,4 +6,7 @@ return [
         'og:description',
         'og:image'
     ],
+    'socialTypes' => [
+        'google'
+    ],
 ];

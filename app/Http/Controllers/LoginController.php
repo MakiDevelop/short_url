@@ -7,6 +7,7 @@ use Socialite;
 
 class LoginController extends Controller
 {
+
     public function __construct()
     {
 
@@ -22,31 +23,28 @@ class LoginController extends Controller
         return view('login');
     }
 
-    public function facebook()
+    public function oauth($type = '')
     {
-        return Socialite::driver('facebook')->redirect();
+        if (in_array($type, config('common.socialTypes'))){
+            return Socialite::driver($type)->redirect();
+        }
+        return redirect('/');
     }
 
-    public function facebookBack()
+    public function oauthBack($type = '')
     {
-        $user = Socialite::driver('facebook')->user();
-        var_dump($user->name);
-        dd($user);
+        if (in_array($type, config('common.socialTypes'))){
+            $user = Socialite::driver($type)->user();
+            var_dump($user->name);
+            var_dump($user->id);
+            var_dump($user->email);
+            dd($user);
+        }
+        return redirect('/');
     }
 
     public function facebookCancel()
     {
 
-    }
-
-    public function google()
-    {
-        return Socialite::driver('google')->redirect();
-    }
-
-    public function googleBack()
-    {
-        $user = Socialite::driver('google')->user();
-        var_dump($user);
     }
 }
