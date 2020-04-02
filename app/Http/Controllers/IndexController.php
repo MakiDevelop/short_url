@@ -26,8 +26,8 @@ class IndexController extends Controller
     public function index()
     {
         if (Auth::id()) {
-            
-            exit;
+            var_dump(Auth::user());
+            // exit;
         }
         return view('index');
     }
