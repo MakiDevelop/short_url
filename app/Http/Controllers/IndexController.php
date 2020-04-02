@@ -26,7 +26,7 @@ class IndexController extends Controller
     public function index()
     {
         if (Auth::guard('user')->id()) {
-            var_dump(Auth::user());
+            var_dump(Auth::guard('user')->user());
             // exit;
         }
         return view('index');
