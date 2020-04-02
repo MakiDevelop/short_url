@@ -21,6 +21,12 @@ class LoginController extends Controller
         return view('login');
     }
 
+    public function logout()
+    {
+        Auth::logout();
+        return redirect('/');
+    }
+
     public function oauth($type = '')
     {
         if (in_array($type, config('common.socialTypes'))) {

@@ -23,6 +23,7 @@ Route::get('/login', 'LoginController@index');
 Route::get('/login/oauth/{type?}', 'LoginController@oauth');
 Route::get('/login/oauth_back/{type?}', 'LoginController@oauthBack');
 Route::get('/login/facebook_cancel', 'LoginController@facebookCancel');
+Route::get('/logout', 'LoginController@logout');
 
 Route::get('/policies/privacy', 'PoliciesController@privacy');
 Route::get('/policies/terms', 'PoliciesController@terms');
