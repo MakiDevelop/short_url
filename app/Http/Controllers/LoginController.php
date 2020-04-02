@@ -34,10 +34,10 @@ class LoginController extends Controller
         if (in_array($type, config('common.socialTypes'))) {
             try {
                 $oauthUser = Socialite::driver($type)->user();
-                var_dump($oauthUser->name);
-                var_dump($oauthUser->id);
-                var_dump($oauthUser->email);
-                dd($oauthUser);
+                // var_dump($oauthUser->name);
+                // var_dump($oauthUser->id);
+                // var_dump($oauthUser->email);
+                // dd($oauthUser);
 
                 $user = $this->userRepository->getByOauthID($type, $oauthUser->id);
                 if ($user) {
