@@ -23,7 +23,7 @@ class LoginController extends Controller
 
     public function logout()
     {
-        Auth::logout();
+        Auth::guard('user')->logout();
         return redirect('/');
     }
 
@@ -59,7 +59,7 @@ class LoginController extends Controller
                     ];
                     $user = $this->userRepository->insert($inserData);
                 }
-                Auth::login($user);
+                Auth::guard('user')->login($user);
                 return redirect('/');
             } catch (Exception $e) {
 
