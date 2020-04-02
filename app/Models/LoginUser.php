@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class LoginUser extends Model
+class LoginUser extends Authenticatable
 {
     /**
      * The table associated with the model.
@@ -28,5 +29,5 @@ class LoginUser extends Model
      *
      * @var array
      */
-    protected $fillable = ['oauth_type', 'oauth_email', 'oauth_id', 'oauth_first_time', 'oauth_last_login'];
+    protected $fillable = ['oauth_type', 'oauth_id', 'oauth_email', 'oauth_first_time', 'oauth_last_login'];
 }
