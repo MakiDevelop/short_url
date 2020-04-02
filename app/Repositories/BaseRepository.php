@@ -24,7 +24,6 @@ class BaseRepository
     {
         $data = $this->getByID($id);
         return $data->fill($datas)->save();
-        // return $data->update($datas);
     }
 
     public function delete($data)

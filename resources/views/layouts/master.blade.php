@@ -61,13 +61,13 @@
         <header>
             <!-- Fixed navbar -->
             <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-                <a class="navbar-brand" href="#">Fixed navbar</a>
+                <a class="navbar-brand" href="/">Chiba.tw</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <ul class="navbar-nav mr-auto">
-                        <li class="nav-item active">
+                    {{-- <ul class="navbar-nav mr-auto"> --}}
+                        {{-- <li class="nav-item active">
                             <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
                         </li>
                         <li class="nav-item">
@@ -75,8 +75,16 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-                        </li>
-                    </ul>                
+                        </li> --}}
+                    {{-- </ul> --}}
+                    
+                </div>
+                <div class="navbar-text">
+                    @if (Auth::guard('user')->check())
+                        <a class="" href="/logout">Logout</a>
+                    @else 
+                        <a class="" href="/login">Login</a>
+                    @endif
                 </div>
             </nav>
         </header>
