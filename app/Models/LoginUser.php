@@ -30,4 +30,14 @@ class LoginUser extends Authenticatable
      * @var array
      */
     protected $fillable = ['oauth_type', 'oauth_id', 'oauth_email', 'oauth_first_time', 'oauth_last_login'];
+
+    /**
+     * Get the password for the user.
+     *
+     * @return string
+     */
+    public function getAuthPassword()
+    {
+        return '';
+    }
 }
