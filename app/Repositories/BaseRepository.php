@@ -16,8 +16,8 @@ class BaseRepository
     public function insert($datas)
     {
         $data = new $this->model();
-        return $data->fill($datas)->save();
-        // return $this->model->insert($datas);
+        // return $data->fill($datas)->save();
+        return $this->model->create($datas);
     }
 
     public function update($id, $datas)
