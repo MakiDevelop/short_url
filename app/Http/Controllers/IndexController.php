@@ -7,6 +7,7 @@ use App\Repositories\UrlShortenerRepository;
 use App\Services\HtmlParserService;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Sinergi\BrowserDetector\Browser;
 use Sinergi\BrowserDetector\Os;
 
@@ -39,7 +40,7 @@ class IndexController extends Controller
             $browser = new Browser();
             // 記錄log
             $insertData = [
-                'us_id'       => '0',
+                'us_id'       => $data->id,
                 'short_url'   => $code,
                 'referral'    => $request->server('HTTP_REFERER'),
                 'os'          => $os->getName(),
@@ -58,27 +59,6 @@ class IndexController extends Controller
         return redirect('/');
     }
 
-    public function test()
-    {
-        $url = 'https://www.apple.com/tw/';
-        // $this->getWebsite($url);
-        $metaDatas = $this->htmlService->metaData($url, config('common.metaProperty'));
-        var_dump($metaDatas);
-        $code = $this->urlRepository->generateCode();
-        var_dump($code);
-
-        var_dump(url($code));
-
-        $insertData = [
-            'original_url' => $url,
-            'short_url'    => $code,
-            'gacode_id'    => '',
-            'fbpixel_id'   => '',
-            'hashtag'      => '',
-        ];
-
-    }
-
     public function shortUrl(Request $request)
     {
         $response = [
@@ -86,16 +66,27 @@ class IndexController extends Controller
         ];
         $post = $request->post();
         if (isset($post['url'])) {
-            $code      = $this->urlRepository->generateCode();
-            $metaDatas = $this->htmlService->metaData($post['url'], config('common.metaProperty'));
-            $tmpData   = [
+            $code = $this->urlRepository->generateCode();
+
+            $tmpData = [
+                'ls_id'        => Auth::guard('user')->id() ?? 0,
                 'original_url' => $post['url'],
                 'short_url'    => $code,
-                'gacode_id'    => '',
-                'fbpixel_id'   => '',
-                'hashtag'      => '',
+                'gacode_id'    => $post['ga_id'] ?? '',
+                'fbpixel_id'   => $post['pixel_id'] ?? '',
+                'hashtag'      => $post['hash_tag'] ?? '',
                 'ip'           => $request->ip(),
             ];
+            if (Auth::guard('user')->check()) {
+                $metaDatas = [
+                    'og_title'       => $post['title'],
+                    'og_description' => $post['description'],
+                    'og_image'       => $post['image'] ?? '',
+                ];
+            } else {
+                $metaDatas = $this->htmlService->metaData($post['url'], config('common.metaProperty'));
+            }
+
             $insertData = array_merge($tmpData, $metaDatas);
             $urlData    = $this->urlRepository->insert($insertData);
             $response   = [
@@ -122,5 +113,32 @@ class IndexController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    private function setValidate($request, $user_id = null, $id = null)
+    {
+        $rules = [
+            'url' => 'required|url',
+        ];
+
+        if (empty($id)) {
+
+        } else {
+
+        }
+
+        if ($user_id) {
+
+        }
+
+        $attribute = [
+            'url'         => '網址',
+            'title'       => 'og:title',
+            'description' => 'og:description',
+        ];
+
+        $validator = Validator::make($request->input(), $rules, [], $attribute);
+
+        return $validator;
     }
 }

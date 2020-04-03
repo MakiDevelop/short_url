@@ -3,10 +3,7 @@
 @section('content')
 <div class="jumbotron"> 
     <button type="button" id="short" class="btn btn-primary" data-toggle="modal" data-target="#fullModal">新增短網址</button>
-    <form action="" method="post" class="">
-        @csrf
-        
-    </form>
+    
     <div class="card d-none" id="short_url">
         <div class="card-body">
             <div class="col-sm-12 text-right">
@@ -23,8 +20,14 @@
     </div>
 </div>
 @include('modal_url')
+
+@endsection
+
+@section('css_link')
+    
 @endsection
 
 @section('js_script')
     <script type="text/javascript" src="{{ asset('/js/user_index.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('/js/images.js') }}"></script>
 @endsection

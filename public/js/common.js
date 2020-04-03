@@ -15,15 +15,36 @@ var App = {
 			});
 		});
 	},
-	readImage: function readImage(input) {
-		if (input.files && input.files[0]) {
-		  var reader = new FileReader();
+	readImage: function readImage(file, img) {
+		if (file) {
+		  	var reader = new FileReader();
 		  
-		  reader.onload = function(e) {
-			$('img').attr('src', e.target.result);
-		  }
+		  	reader.onload = function(e) {
+				$(img).attr('src', e.target.result);
+		  	}
 		  
-		  reader.readAsDataURL(input.files[0]);
+		  	reader.readAsDataURL(file);
+		}
+	},
+	isUrl: function isUrl(s) {
+		var regexp = /(http|https|line):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+		return regexp.test(s);
+	},
+	copyToClipboard: function copyToClipboard(id) {
+		var text = document.getElementById(id);
+			//做下相容
+		if (document.body.createTextRange) {  //如果支援
+			var range = document.body.createTextRange(); //獲取range
+			range.moveToElementText(text); //游標移上去
+			range.select();  //選擇
+			document.execCommand('copy');
+		} else if (window.getSelection) {
+			var selection = window.getSelection(); //獲取selection
+			var range = document.createRange(); //建立range
+			range.selectNodeContents(text);  //選擇節點內容
+			selection.removeAllRanges(); //移除所有range
+			selection.addRange(range);  //新增range
+			document.execCommand('copy');
 		}
 	},
 	ajax: function ajax(url, method, data, callbackSuccess) {

@@ -1,6 +1,6 @@
 $(function () {
     $('#url').change(function(){
-        if (isUrl($(this).val())) {
+        if (App.isUrl($(this).val())) {
             let url = new URL($(this).val());
             let params = url.searchParams;
             if (params.has('fbclid')) {
@@ -35,28 +35,6 @@ $(function () {
     });
 
     $('#copy').click(function(){
-        copyToClipboard('url_text')
+        App.copyToClipboard('url_text')
     });
 });
-function isUrl(s) {
-    var regexp = /(http|https|line):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
-    return regexp.test(s);
-}
-
-function copyToClipboard(id) {
-    var text = document.getElementById(id);
-        //做下相容
-    if (document.body.createTextRange) {  //如果支援
-        var range = document.body.createTextRange(); //獲取range
-        range.moveToElementText(text); //游標移上去
-        range.select();  //選擇
-        document.execCommand('copy');
-    } else if (window.getSelection) {
-        var selection = window.getSelection(); //獲取selection
-        var range = document.createRange(); //建立range
-        range.selectNodeContents(text);  //選擇節點內容
-        selection.removeAllRanges(); //移除所有range
-        selection.addRange(range);  //新增range
-        document.execCommand('copy');
-    }
-}

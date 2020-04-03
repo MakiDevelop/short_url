@@ -77,14 +77,15 @@
                             <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
                         </li> --}}
                     {{-- </ul> --}}
-                    
-                </div>
-                <div class="navbar-text">
-                    @if (Auth::guard('user')->check())
-                        <a class="" href="/logout">Logout</a>
-                    @else 
-                        <a class="" href="/login">Login</a>
-                    @endif
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            @if (Auth::guard('user')->check())
+                                <a class="nav-link" href="/logout">Logout</a>
+                            @else 
+                                <a class="nav-link" href="/login">Login</a>
+                            @endif
+                        </li>
+                    </ul>
                 </div>
             </nav>
         </header>
