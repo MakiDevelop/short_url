@@ -28,5 +28,5 @@ class UrlShortener extends Model
      *
      * @var array
      */
-    protected $fillable = ['original_url', 'short_url', 'og_title', 'og_descript', 'og_image', 'gacode_id', 'fbpixel_id', 'hashtag', 'ip'];
+    protected $fillable = ['original_url', 'short_url', 'og_title', 'og_descript', 'og_image', 'gacode_id', 'fbpixel_id', 'clicks', 'hashtag', 'ip'];
 }

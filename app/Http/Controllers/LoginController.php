@@ -27,6 +27,16 @@ class LoginController extends Controller
         return redirect('/');
     }
 
+    public function testo()
+    {
+        if (env('APP_ENV') == 'local') {
+            $user = \App\Models\LoginUser::find(1);
+            Auth::guard('user')->login($user);
+        }
+        
+        return redirect('/');
+    }
+
     public function oauth($type = '')
     {
         if (in_array($type, config('common.socialTypes'))) {

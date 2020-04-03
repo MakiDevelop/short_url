@@ -34,4 +34,9 @@ class UrlShortenerRepository extends BaseRepository
         return $this->model->where('short_url', $code)->first();
     }
 
+    public function getCodeForUpdate($code)
+    {
+        return $this->model->where('short_url', $code)->lockForUpdate()->first();
+    }
+
 }

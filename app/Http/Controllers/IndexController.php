@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Repositories\ClickLogRepository;
 use App\Repositories\UrlShortenerRepository;
 use App\Services\HtmlParserService;
+use Auth;
 use Illuminate\Http\Request;
 use Sinergi\BrowserDetector\Browser;
 use Sinergi\BrowserDetector\Os;
-use Auth;
 
 class IndexController extends Controller
 {
@@ -26,15 +26,14 @@ class IndexController extends Controller
     public function index()
     {
         if (Auth::guard('user')->id()) {
-            var_dump(Auth::guard('user')->user());
-            // exit;
+            return view('user_index');
         }
         return view('index');
     }
 
     public function urlData(Request $request, $code)
     {
-        $data = $this->urlRepository->getByCode($code);
+        $data = $this->urlRepository->getCodeForUpdate($code);
         if ($data) {
             $os      = new Os();
             $browser = new Browser();
@@ -50,6 +49,9 @@ class IndexController extends Controller
                 'click_time'  => date('Y-m-d H:i:s'),
             ];
             $this->logRepository->insert($insertData);
+            // update clicks number
+            $data->clicks += 1;
+            $data->save();
 
             return view('url', compact('data'));
         }
@@ -102,6 +104,23 @@ class IndexController extends Controller
                 'short_url' => url($code),
             ];
         }
+        return response()->json($response);
+    }
+
+    public function website(Request $request)
+    {
+        $response = [
+            'success' => false,
+            'data'    => [],
+            'msg'     => '',
+        ];
+        $post = $request->post();
+        if ($post && isset($post['url'])) {
+            $metaDatas           = $this->htmlService->metaData($post['url'], config('common.metaProperty'));
+            $response['success'] = true;
+            $response['data']    = $metaDatas;
+        }
+
         return response()->json($response);
     }
 }
