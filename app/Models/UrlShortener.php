@@ -30,7 +30,15 @@ class UrlShortener extends Model
      *
      * @var array
      */
-    protected $fillable = ['original_url', 'short_url', 'ls_id', 'og_title', 'og_description', 'og_image', 'gacode_id', 'fbpixel_id', 'clicks', 'hashtag', 'ip'];
+    protected $fillable = ['original_url', 'short_url', 'lu_id', 'og_title', 'og_description', 'og_image', 'gacode_id', 'fbpixel_id', 'clicks', 'hashtag', 'ip'];
+
+    public function getOgImageAttribute($value)
+    {
+        if (strpos('http', $value) !== false) {
+            return $value;
+        }
+        return url('/image/url/' . $value);
+    }
 
     public function tags()
     {

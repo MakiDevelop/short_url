@@ -16,7 +16,9 @@ class UrlShortenerRepository extends BaseRepository
 
     public function list($params = [])
     {
-        return $this->model->where('lu_id', $params['lu_id'])->paginate(config('constants.per_page'));
+        return $this->model->where('lu_id', $params['lu_id'])
+                ->orderBy('id', 'desc')
+                ->paginate(config('constants.per_page'));
     }
 
     public function generateCode($num = 8)

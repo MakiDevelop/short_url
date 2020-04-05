@@ -19,8 +19,8 @@
                         <div class="d-inline p-2">
                             <button type="button" name="copy{{ $index }}" data-index="{{ $index }}" class="btn btn-primary">複製</button>
                             <button type="button" name="qrcode{{ $index }}" data-index="{{ $index }}" class="btn btn-primary" data-toggle="collapse" data-target="#collapseQRCode{{ $index }}" aria-expanded="false" aria-controls="collapseQRCode{{ $index }}">QRCode</button>
-                            <button type="button" name="edit{{ $index }}" data-short="{{ $item->short_url }}" class="btn btn-primary">Edit</button>
-                            <button type="button" name="delete{{ $index }}" data-short="{{ $item->short_url }}" class="btn btn-danger">Delete</button>
+                            <button type="button" name="edit{{ $index }}" data-index="{{ $index }}" data-code="{{ $item->short_url }}" class="btn btn-primary">Edit</button>
+                            <button type="button" name="delete{{ $index }}" data-index="{{ $index }}" data-code="{{ $item->short_url }}" class="btn btn-danger">Delete</button>
                         </div>
                     </div>
                     <div class="">

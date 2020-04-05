@@ -74,7 +74,7 @@ class IndexController extends Controller
             $code = $this->urlRepository->generateCode();
 
             $tmpData = [
-                'ls_id'        => Auth::guard('user')->id() ?? 0,
+                'lu_id'        => Auth::guard('user')->id() ?? 0,
                 'original_url' => $post['url'],
                 'short_url'    => $code,
                 'gacode_id'    => $post['ga_id'] ?? '',
@@ -88,6 +88,14 @@ class IndexController extends Controller
                     'og_description' => $post['description'],
                     'og_image'       => $post['image'] ?? '',
                 ];
+                if ($request->hasFile('image_file')) {
+                    $post     = $request->input();
+                    $image    = $request->file('image_file');
+                    // $fileName = $image->getClientOriginalName();
+                    $fileName = uniqid('img_') . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('/image/url'), $fileName);
+                    $metaDatas['og_image'] = $fileName;
+                }
             } else {
                 $metaDatas = $this->htmlService->metaData($post['url'], config('common.metaProperty'));
             }
@@ -132,7 +140,7 @@ class IndexController extends Controller
     public function urlDelete()
     {
         if (Auth::guard('user')->check()) {
-            
+
         }   
     }
 

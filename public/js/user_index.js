@@ -42,7 +42,7 @@ $(function () {
 					$('#send').prop('disabled', false);
                 }
                 if (response.success) {
-                    
+                    location.reload();
                 }
             };
         App.ajaxUpload(url, method, data, callbackSuccess);
