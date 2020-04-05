@@ -5,6 +5,7 @@ $(function () {
     $('#image_file').change(function(){
         App.readImage(this.files[0], $('#pre_image'));
         $('#text_block').hide();
+        $('#remove_image_file').removeClass('d-none');
     });
 
     $('#input-file-now').change(function(){
@@ -12,6 +13,14 @@ $(function () {
     }); 
     $('#target').click(function(){
         $('#input-file-now').click();
+    });
+
+    $('#remove_image_file').click(function(){
+        $('#image_file').val('');
+        $(this).addClass('d-none');
+        $('#pre_image').attr('src', $('#image').val());
+        $('#text_block').show();
+        return false;
     });
 });
 function dragstart_handler(ev) {
@@ -30,27 +39,14 @@ function drop_handler(ev, fileID, imageID) {
     ev.preventDefault();
     if (ev.dataTransfer.items) {
         var file = ev.dataTransfer.items[0].getAsFile();
-        $('#'+fileID).files = file;
-        App.readImage(file, $('#'+imageID));
-
-        // for (var i = 0; i < ev.dataTransfer.items.length; i++) {
-        //     if (ev.dataTransfer.items[i].kind === 'file') {
-        //         var file = ev.dataTransfer.items[i].getAsFile();
-        //         console.log('... file[' + i + '].name = ' + file.name);
-        //         console.log('... file[' + i + '].size = ' + file.size);
-        //         console.log('... file[' + i + '].type = ' + file.type);
-        //     }
-        // }
     } else {
         // Use DataTransfer interface to access the file(s)
         var file = ev.dataTransfer.files[0];
-        $('#'+fileID).files = file;
-        App.readImage(file, $('#'+imageID));
-        
-        // for (var i = 0; i < ev.dataTransfer.files.length; i++) {
-        //     console.log('... file[' + i + '].name = ' + ev.dataTransfer.files[i].name);
-        // }
     }
+    $('#'+fileID).files = file;
+    App.readImage(file, $('#'+imageID));
+    $('#text_block').hide();
+    $('#remove_image_file').removeClass('d-none');
 }
 
 // function drop_handler(ev) {
