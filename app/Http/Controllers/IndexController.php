@@ -29,9 +29,9 @@ class IndexController extends Controller
     public function index(Request $request)
     {
         if (Auth::guard('user')->id()) {
-            $params = $querys = $request->query();
+            $params          = $querys          = $request->query();
             $params['lu_id'] = Auth::guard('user')->id();
-            $lists = $this->urlRepository->list($params);
+            $lists           = $this->urlRepository->list($params);
             return view('user_index', compact('lists', 'querys'));
         }
         return view('index');
@@ -89,8 +89,8 @@ class IndexController extends Controller
                     'og_image'       => $post['image'] ?? '',
                 ];
                 if ($request->hasFile('image_file')) {
-                    $post     = $request->input();
-                    $image    = $request->file('image_file');
+                    $post  = $request->input();
+                    $image = $request->file('image_file');
                     // $fileName = $image->getClientOriginalName();
                     $fileName = uniqid('img_') . '.' . $image->getClientOriginalExtension();
                     $image->move(public_path('/image/url'), $fileName);
@@ -127,21 +127,79 @@ class IndexController extends Controller
             'data'    => [],
             'msg'     => '',
         ];
-        $post = $request->post();
-        if ($post && isset($post['url'])) {
-            $metaDatas           = $this->htmlService->metaData($post['url'], config('common.metaProperty'));
-            $response['success'] = true;
-            $response['data']    = $metaDatas;
+        if (Auth::guard('user')->check()) {
+            $post = $request->post();
+            if ($post && isset($post['url'])) {
+                $metaDatas           = $this->htmlService->metaData($post['url'], config('common.metaProperty'));
+                $response['success'] = true;
+                $response['data']    = $metaDatas;
+            }
         }
-
         return response()->json($response);
     }
 
-    public function urlDelete()
+    public function url(Request $request)
     {
+        $response = [
+            'success' => false,
+            'data'    => [],
+            'msg'     => '請確認資料是否正確!',
+        ];
+        if (Auth::guard('user')->check()) {
+            $code    = $request->query('code');
+            $urlData = $this->urlRepository->getByUserCode(Auth::guard('user')->id(), $code);
+            if ($urlData) {
+                $response = [
+                    'success' => true,
+                    'data'    => [
+                        'code'        => $urlData->short_url,
+                        'title'       => $urlData->og_title,
+                        'description' => $urlData->og_description,
+                        'image'       => $urlData->og_image,
+                        'hashtag'     => $urlData->hashtag,
+                    ],
+                    'msg'     => '',
+                ];
+            }
+        }
+        return response()->json($response);
+    }
+
+    public function urlUpdate(Request $request)
+    {
+        $response = [
+            'success' => false,
+            'msg'     => '請確認資料是否正確!',
+        ];
         if (Auth::guard('user')->check()) {
 
-        }   
+            $post = $request->input();
+
+            $tags = explode(',', $post['hash_tag']);
+            if (count($tags)) {
+                $this->tagsRepository->processTags($urlData->id, $tags);
+            }
+        }
+    }
+
+    public function urlDelete(Request $request)
+    {
+        $response = [
+            'success' => false,
+            'msg'     => '請確認資料是否正確!',
+        ];
+        if (Auth::guard('user')->check()) {
+            $code = $request->input('code');
+            if ($code) {
+                $urlData = $this->urlRepository->getByUserCode(Auth::guard('user')->id(), $code);
+                if ($urlData) {
+                    $this->urlRepository->delete($urlData);
+                    $response['success'] = true;
+                    $response['msg']     = '刪除成功!';
+                }
+            }
+        }
+        return response()->json($response);
     }
 
     public function test()
@@ -155,7 +213,6 @@ class IndexController extends Controller
             var_dump($url);
         }
     }
-
 
     private function setValidate($request, $user_id = null, $id = null)
     {

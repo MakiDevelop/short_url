@@ -12,7 +12,7 @@
                     <div class="">
                         {{ $item->created_at->format('Y-m-d') }}
                     </div>
-                    <div class="">{{ $item->og_title }}</div>
+                    <div id="title{{ $index }}" class="">{{ $item->og_title }}</div>
                     <div class="">{{ $item->original_url }}</div>
                     <div class="">
                         <p id="url_text{{ $index }}" class="d-inline">{{ url($item->short_url) }}</p>
@@ -46,6 +46,7 @@
 
 
 @include('modal_url')
+@include('modal_url_delete')
 
 @endsection
 

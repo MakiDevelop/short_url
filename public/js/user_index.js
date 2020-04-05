@@ -47,7 +47,6 @@ $(function () {
             };
         App.ajaxUpload(url, method, data, callbackSuccess);
     });
-
     $('[name^=copy]').click(function(){
         var target_id = 'url_text' + $(this).data('index');
         App.copyToClipboard(target_id);
@@ -60,5 +59,38 @@ $(function () {
             var img_url = 'https://chart.googleapis.com/chart?cht=qr&chs=200x200&choe=UTF-8&chl=' + encodeURIComponent($(target_id).text());
             $('#collapseQRCode' + num).prepend('<img src="'+ img_url +'" />');
         }
+    });
+
+    // edit
+
+
+    // delete
+    $('[name^=delete]').click(function(){
+        var num = $(this).data('index');
+        $('#delete_code').val($(this).data('code'));
+        $('#del_short_text').text($('#url_text' + num).text());
+        $('#deleteModal').modal('show');
+    });
+    $('#deleteModal').on('hide.bs.modal', function (e) {
+        $('#delete_code').val('');
+    });
+    $('#delete_btn').click(function(){
+        var url = '/index/url_delete',
+            method = 'POST',
+            data = $('#delete_form').serialize(),
+            callbackSuccess = function (response) {
+                console.log(response);
+                if ($('#error_alert').is(':visible')) {
+                    $('#error_alert').attr('hidden', 'hidden');
+                }
+                
+                if ($('#delete_btn').length > 0) {
+					$('#delete_btn').prop('disabled', false);
+                }
+                if (response.success) {
+                    location.reload();
+                }
+            };
+        App.ajax(url, method, data, callbackSuccess);
     });
 });

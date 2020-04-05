@@ -10,6 +10,7 @@
             <div class="modal-body">
                 <form action="" method="post" class="">
                     @csrf
+                    <input type="hidden" id="code" name="code">
                     <div class="form-group">
                         <label for="url" class="col-form-label">網址</label>
                         <input type="url" class="form-control form-control-lg" id="url" name="url" placeholder="網址">
