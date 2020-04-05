@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UrlShortener extends Model
 {
+    use SoftDeletes;
     /**
      * The table associated with the model.
      *
@@ -29,4 +31,9 @@ class UrlShortener extends Model
      * @var array
      */
     protected $fillable = ['original_url', 'short_url', 'ls_id', 'og_title', 'og_description', 'og_image', 'gacode_id', 'fbpixel_id', 'clicks', 'hashtag', 'ip'];
+
+    public function tags()
+    {
+        return $this->hasMany('App\Models\HashTags', 'us_id', 'id');
+    }
 }

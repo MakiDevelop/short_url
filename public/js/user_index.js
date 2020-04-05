@@ -47,4 +47,18 @@ $(function () {
             };
         App.ajaxUpload(url, method, data, callbackSuccess);
     });
+
+    $('[name^=copy]').click(function(){
+        var target_id = 'url_text' + $(this).data('index');
+        App.copyToClipboard(target_id);
+    });
+    $('[name^=qrcode]').click(function(){
+        var num = $(this).data('index'),
+            target_id = '#url_text' + num;
+
+        if ($('#collapseQRCode' + num).find('img').length == 0) {
+            var img_url = 'https://chart.googleapis.com/chart?cht=qr&chs=200x200&choe=UTF-8&chl=' + encodeURIComponent($(target_id).text());
+            $('#collapseQRCode' + num).prepend('<img src="'+ img_url +'" />');
+        }
+    });
 });

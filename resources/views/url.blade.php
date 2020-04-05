@@ -67,6 +67,8 @@
                 margin-bottom: 30px;
             }
         </style>
+        @include('ga_script')
+        @include('fb_script')
     </head>
     <body>
         

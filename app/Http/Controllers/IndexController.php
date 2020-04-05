@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\ClickLogRepository;
+use App\Repositories\HashTagsRepository;
 use App\Repositories\UrlShortenerRepository;
 use App\Services\HtmlParserService;
 use Auth;
@@ -15,19 +16,23 @@ class IndexController extends Controller
 {
     protected $client;
     protected $htmlService;
-    protected $urlRepository, $logRepository;
-    public function __construct(HtmlParserService $htmlService, UrlShortenerRepository $urlRepository, ClickLogRepository $logRepository)
+    private $urlRepository, $logRepository, $tagsRepository;
+    public function __construct(HtmlParserService $htmlService, UrlShortenerRepository $urlRepository, ClickLogRepository $logRepository, HashTagsRepository $tagsRepository)
     {
-        $this->client        = new \GuzzleHttp\Client();
-        $this->htmlService   = $htmlService;
-        $this->urlRepository = $urlRepository;
-        $this->logRepository = $logRepository;
+        $this->client         = new \GuzzleHttp\Client();
+        $this->htmlService    = $htmlService;
+        $this->urlRepository  = $urlRepository;
+        $this->logRepository  = $logRepository;
+        $this->tagsRepository = $tagsRepository;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         if (Auth::guard('user')->id()) {
-            return view('user_index');
+            $params = $querys = $request->query();
+            $params['lu_id'] = Auth::guard('user')->id();
+            $lists = $this->urlRepository->list($params);
+            return view('user_index', compact('lists', 'querys'));
         }
         return view('index');
     }
@@ -89,7 +94,16 @@ class IndexController extends Controller
 
             $insertData = array_merge($tmpData, $metaDatas);
             $urlData    = $this->urlRepository->insert($insertData);
-            $response   = [
+
+            // hash tag
+            if (Auth::guard('user')->check()) {
+                $tags = explode(',', $post['hash_tag']);
+                if (count($tags)) {
+                    $this->tagsRepository->processTags($urlData->id, $tags);
+                }
+            }
+
+            $response = [
                 'success'   => true,
                 'code'      => $code,
                 'short_url' => url($code),
@@ -114,6 +128,26 @@ class IndexController extends Controller
 
         return response()->json($response);
     }
+
+    public function urlDelete()
+    {
+        if (Auth::guard('user')->check()) {
+            
+        }   
+    }
+
+    public function test()
+    {
+        if (env('APP_ENV') == 'local') {
+            $urlData = $this->urlRepository->getByID(14);
+            var_dump($urlData->toArray());
+            var_dump($urlData->tags->toArray());
+
+            $url = \App\Models\HashTags::withTrashed()->where('us_id', 14)->where('tag_name', 'Apple')->first();
+            var_dump($url);
+        }
+    }
+
 
     private function setValidate($request, $user_id = null, $id = null)
     {

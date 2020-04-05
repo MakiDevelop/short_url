@@ -45,7 +45,7 @@
                     </div>
                     <div class="form-group">
                         <label for="hash_tag" class="col-form-label">hash tag</label>
-                        <input type="text" class="form-control form-control-lg" id="hash_tag" name="hash_tag" placeholder="請用半型逗號(,)隔開">
+                        <textarea class="form-control" id="hash_tag" name="hash_tag" rows="3" placeholder="請用半型逗號(,)隔開"></textarea>
                     </div>
                 </form>
             </div>

@@ -16,17 +16,17 @@ class UrlShortenerRepository extends BaseRepository
 
     public function list($params = [])
     {
-        // return $this->model->paginate(config('constants.per_page'));
+        return $this->model->where('lu_id', $params['lu_id'])->paginate(config('constants.per_page'));
     }
 
-    public function generateCode()
+    public function generateCode($num = 8)
     {
-        $code = Str::random(7);
+        $code = Str::random($num);
         $shortUrl = $this->model->where('short_url', $code)->first();
         if (!$shortUrl) {
             return $code;
         }
-        return $this->generateCode();
+        return $this->generateCode($num);
     }
 
     public function getByCode($code)
