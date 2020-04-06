@@ -89,7 +89,8 @@ class IndexController extends Controller
                     // $fileName = $image->getClientOriginalName();
                     $fileName = uniqid('img_') . '.' . $image->getClientOriginalExtension();
                     $image->move(public_path('/image/url/'), $fileName);
-                    $metaDatas['og_image'] = $fileName;
+                    $updateData['og_image'] = $fileName;
+                    $response['image'] = $fileName;
                 }
                 $isUpdate = $this->urlRepository->update($urlData->id, $updateData);
                 if ($isUpdate) {
