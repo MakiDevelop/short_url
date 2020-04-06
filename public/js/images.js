@@ -35,19 +35,13 @@ function dragover_handler(ev) {
     // Set the dropEffect to move
     ev.dataTransfer.dropEffect = "move"
 }
-function drop_handler(ev, fileID, imageID) {
-    ev.preventDefault();
-    if (ev.dataTransfer.items) {
-        var file = ev.dataTransfer.items[0].getAsFile();
-    } else {
-        // Use DataTransfer interface to access the file(s)
-        var file = ev.dataTransfer.files[0];
-    }
-    $('#'+fileID).files = file;
-    App.readImage(file, $('#'+imageID));
+document.getElementById('image_block').ondrop = function(ev) {
+    document.getElementById('image_file').files = ev.dataTransfer.files;
+    App.readImage(ev.dataTransfer.files[0], $('#pre_image'));
     $('#text_block').hide();
     $('#remove_image_file').removeClass('d-none');
-}
+    ev.preventDefault();
+};
 
 // function drop_handler(ev) {
 //     ev.preventDefault();

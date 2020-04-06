@@ -25,12 +25,12 @@
                     </div>
                     <div class="form-group">
                         <input type="hidden" id="image" name="image">
-                        <input type="file" name="image_file" id="image_file" accept="image/*" class="d-none">
                         <label for="image_block" class="col-form-label">og:image</label>
-                        <div class="position-relative" id="image_block" ondrop="drop_handler(event, 'image_file', 'pre_image');" ondragover="dragover_handler(event);">
+                        <div class="position-relative" id="image_block" ondragover="dragover_handler(event);">
                             <button id="remove_image_file" type="button" class="close d-none">
                                 <span aria-hidden="true">×</span>
                             </button>
+                            <input type="file" name="image_file" id="image_file" accept="image/*" class="d-none">
                             <div class="text-center">
                                 <img id="pre_image" width="200" heigh="200" src="" class="rounded" alt="">
                             </div>

@@ -91,7 +91,11 @@ class IndexController extends Controller
                     $image->move(public_path('/image/url/'), $fileName);
                     $updateData['og_image'] = $fileName;
                     $response['image'] = $fileName;
+                } else {
+                    $response['image'] = 'not have';
                 }
+                $response['file'] = $request->file('image_file');
+                $response['post'] = $post;
                 $isUpdate = $this->urlRepository->update($urlData->id, $updateData);
                 if ($isUpdate) {
                     // hash tag
@@ -99,10 +103,8 @@ class IndexController extends Controller
                     if (count($tags)) {
                         $this->tagsRepository->processTags($urlData->id, $tags);
                     }
-                    $response = [
-                        'success' => true,
-                        'msg'     => '修改成功',
-                    ];
+                    $response['success'] = true;
+                    $response['msg'] = '修改成功';
                 }
             } else {
                 if (empty($urlData)) {
