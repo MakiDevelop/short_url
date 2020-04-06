@@ -60,7 +60,7 @@ class IndexController extends Controller
             $data->save();
             // 確認是否要轉頁
             $isRedirect = true;
-            if (strpos($request->header('User-Agent'), 'facebook')) {
+            if (strpos($request->header('User-Agent'), 'facebook') !== false) {
                 $isRedirect = false;
             }
 
