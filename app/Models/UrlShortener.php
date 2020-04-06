@@ -34,7 +34,7 @@ class UrlShortener extends Model
 
     public function getOgImageAttribute($value)
     {
-        if (strpos('http', $value) !== false) {
+        if (strpos($value, 'http') !== false) {
             return $value;
         }
         return url('/image/url/' . $value);

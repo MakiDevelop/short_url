@@ -17,6 +17,7 @@
 
 Route::get('/', 'IndexController@index');
 Route::get('/index/test', 'IndexController@test');
+Route::get('/index/url', 'IndexController@url');
 Route::post('/index/short_url', 'IndexController@shortUrl');
 Route::post('/index/website', 'IndexController@website');
 Route::post('/index/url_delete', 'IndexController@urlDelete');

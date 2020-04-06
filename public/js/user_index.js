@@ -61,8 +61,40 @@ $(function () {
         }
     });
 
-    // edit
+    $('#fullModal').on('hide.bs.modal', function (e) {
+        $('#code').val('')
+        $('#url_form')[0].reset();
+        $('#pre_image').attr('src', '');
+    });
 
+    // edit
+    $('[name^=edit]').click(function(){
+        var url = '/index/url',
+            method = 'GET',
+            code = $(this).data('code'),
+            data = {},
+            callbackSuccess = function (response) {
+                console.log(response);
+                if ($('#error_alert').is(':visible')) {
+                    $('#error_alert').attr('hidden', 'hidden');
+                }
+                
+                if (response.success) {
+                    $('#code').val(response.data.code);
+                    $('#url').val(response.data.url);
+                    $('#title').val(response.data.title);
+                    $('#description').val(response.data.description);
+                    $('#image').val(response.data.image);
+                    $('#pre_image').attr('src', response.data.image);
+                    $('#ga_id').val(response.data.ga_id);
+                    $('#pixel_id').val(response.data.pixel_id);
+                    $('#hash_tag').val(response.data.hashtag);
+                    $('#fullModal').modal('show');
+                }
+            };
+            
+        App.ajaxUpload(url + '?code=' + code, method, data, callbackSuccess);
+    });
 
     // delete
     $('[name^=delete]').click(function(){
@@ -79,7 +111,6 @@ $(function () {
             method = 'POST',
             data = $('#delete_form').serialize(),
             callbackSuccess = function (response) {
-                console.log(response);
                 if ($('#error_alert').is(':visible')) {
                     $('#error_alert').attr('hidden', 'hidden');
                 }

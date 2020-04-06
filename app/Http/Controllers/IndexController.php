@@ -70,23 +70,18 @@ class IndexController extends Controller
             'success' => false,
         ];
         $post = $request->post();
-        if (isset($post['url'])) {
-            $code = $this->urlRepository->generateCode();
-
-            $tmpData = [
-                'lu_id'        => Auth::guard('user')->id() ?? 0,
-                'original_url' => $post['url'],
-                'short_url'    => $code,
-                'gacode_id'    => $post['ga_id'] ?? '',
-                'fbpixel_id'   => $post['pixel_id'] ?? '',
-                'hashtag'      => $post['hash_tag'] ?? '',
-                'ip'           => $request->ip(),
-            ];
-            if (Auth::guard('user')->check()) {
-                $metaDatas = [
+        if (isset($post['code']) && Auth::guard('user')->check() && $post['code']) {
+            $urlData = $this->urlRepository->getByUserCode(Auth::guard('user')->id(), $post['code']);
+            $validator = $this->setValidate($request, Auth::guard('user')->id(), $urlData->id);
+            if ($urlData && $validator->passes()) {
+                $updateData = [
+                    'original_url'   => $post['url'],
                     'og_title'       => $post['title'],
                     'og_description' => $post['description'],
                     'og_image'       => $post['image'] ?? '',
+                    'gacode_id'      => $post['ga_id'] ?? '',
+                    'fbpixel_id'     => $post['pixel_id'] ?? '',
+                    'hashtag'        => $post['hash_tag'] ?? '',
                 ];
                 if ($request->hasFile('image_file')) {
                     $post  = $request->input();
@@ -96,26 +91,76 @@ class IndexController extends Controller
                     $image->move(public_path('/image/url'), $fileName);
                     $metaDatas['og_image'] = $fileName;
                 }
+                $isUpdate = $this->urlRepository->update($urlData->id, $updateData);
+                if ($isUpdate) {
+                    // hash tag
+                    $tags = explode(',', $post['hash_tag']);
+                    if (count($tags)) {
+                        $this->tagsRepository->processTags($urlData->id, $tags);
+                    }
+                    $response = [
+                        'success' => true,
+                        'msg'     => '修改成功',
+                    ];
+                }
             } else {
-                $metaDatas = $this->htmlService->metaData($post['url'], config('common.metaProperty'));
-            }
-
-            $insertData = array_merge($tmpData, $metaDatas);
-            $urlData    = $this->urlRepository->insert($insertData);
-
-            // hash tag
-            if (Auth::guard('user')->check()) {
-                $tags = explode(',', $post['hash_tag']);
-                if (count($tags)) {
-                    $this->tagsRepository->processTags($urlData->id, $tags);
+                if (empty($urlData)) {
+                    $response['msg'] = '請確認資料是否正確!';
+                } else {
+                    $response['msg'] = implode('<br />', $validator->errors()->all());
                 }
             }
+        } else if (empty($post['code']) && isset($post['url'])) {
+            $validator = $this->setValidate($request, Auth::guard('user')->id());
+            if ($validator->passes()) {
+                $code = $this->urlRepository->generateCode();
 
-            $response = [
-                'success'   => true,
-                'code'      => $code,
-                'short_url' => url($code),
-            ];
+                $tmpData = [
+                    'lu_id'        => Auth::guard('user')->id() ?? 0,
+                    'original_url' => $post['url'],
+                    'short_url'    => $code,
+                    'gacode_id'    => $post['ga_id'] ?? '',
+                    'fbpixel_id'   => $post['pixel_id'] ?? '',
+                    'hashtag'      => $post['hash_tag'] ?? '',
+                    'ip'           => $request->ip(),
+                ];
+                if (Auth::guard('user')->check()) {
+                    $metaDatas = [
+                        'og_title'       => $post['title'],
+                        'og_description' => $post['description'],
+                        'og_image'       => $post['image'] ?? '',
+                    ];
+                    if ($request->hasFile('image_file')) {
+                        $post  = $request->input();
+                        $image = $request->file('image_file');
+                        // $fileName = $image->getClientOriginalName();
+                        $fileName = uniqid('img_') . '.' . $image->getClientOriginalExtension();
+                        $image->move(public_path('/image/url'), $fileName);
+                        $metaDatas['og_image'] = $fileName;
+                    }
+                } else {
+                    $metaDatas = $this->htmlService->metaData($post['url'], config('common.metaProperty'));
+                }
+
+                $insertData = array_merge($tmpData, $metaDatas);
+                $urlData    = $this->urlRepository->insert($insertData);
+
+                // hash tag
+                if (Auth::guard('user')->check()) {
+                    $tags = explode(',', $post['hash_tag']);
+                    if (count($tags)) {
+                        $this->tagsRepository->processTags($urlData->id, $tags);
+                    }
+                }
+
+                $response = [
+                    'success'   => true,
+                    'code'      => $code,
+                    'short_url' => url($code),
+                ];
+            } else {
+                $response['msg'] = implode('<br />', $validator->errors()->all());
+            }
         }
         return response()->json($response);
     }
@@ -153,9 +198,12 @@ class IndexController extends Controller
                     'success' => true,
                     'data'    => [
                         'code'        => $urlData->short_url,
+                        'url'         => $urlData->original_url,
                         'title'       => $urlData->og_title,
                         'description' => $urlData->og_description,
                         'image'       => $urlData->og_image,
+                        'ga_id'       => $urlData->gacode_id,
+                        'pixel_id'    => $urlData->fbpixel_id,
                         'hashtag'     => $urlData->hashtag,
                     ],
                     'msg'     => '',
@@ -205,13 +253,17 @@ class IndexController extends Controller
     public function test()
     {
         if (env('APP_ENV') == 'local') {
-            $urlData = $this->urlRepository->getByID(14);
-            var_dump($urlData->toArray());
-            var_dump($urlData->tags->toArray());
+            // $urlData = $this->urlRepository->getByID(14);
+            // var_dump($urlData->toArray());
+            // var_dump($urlData->tags->toArray());
 
-            $url = \App\Models\HashTags::withTrashed()->where('us_id', 14)->where('tag_name', 'Apple')->first();
-            var_dump($url);
+            // $url = \App\Models\HashTags::withTrashed()->where('us_id', 14)->where('tag_name', 'Apple')->first();
+            // var_dump($url);
         }
+
+        $image = 'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/ipad-pro-og-202003?wid=1200&amp;hei=630&amp;fmt=jpeg&amp;qlt=95&amp;op_usm=0.5,0.5&amp;.v=1583201083141';
+        $pos   = strpos($image, 'http');
+        var_dump($pos);
     }
 
     private function setValidate($request, $user_id = null, $id = null)
