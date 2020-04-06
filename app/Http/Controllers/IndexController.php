@@ -88,7 +88,7 @@ class IndexController extends Controller
                     $image = $request->file('image_file');
                     // $fileName = $image->getClientOriginalName();
                     $fileName = uniqid('img_') . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('/image/url'), $fileName);
+                    $image->move(public_path('/image/url/'), $fileName);
                     $metaDatas['og_image'] = $fileName;
                 }
                 $isUpdate = $this->urlRepository->update($urlData->id, $updateData);
@@ -135,7 +135,7 @@ class IndexController extends Controller
                         $image = $request->file('image_file');
                         // $fileName = $image->getClientOriginalName();
                         $fileName = uniqid('img_') . '.' . $image->getClientOriginalExtension();
-                        $image->move(public_path('/image/url'), $fileName);
+                        $image->move(public_path('/image/url/'), $fileName);
                         $metaDatas['og_image'] = $fileName;
                     }
                 } else {

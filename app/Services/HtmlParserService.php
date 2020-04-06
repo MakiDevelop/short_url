@@ -27,9 +27,9 @@ class HtmlParserService
                     $key = str_replace(':', '_', $meta->property);
                     $metaDatas[$key] = $meta->content;
                 }
-                // var_dump($meta->property);
-                // var_dump($meta->content);
-                // echo '<br />=====================<br />';
+            }
+            if (empty($metaDatas['og_title'])) {
+                $metaDatas['og_title'] = $dom->find('title')->text;
             }
         } catch (\Exception $e) {
 
