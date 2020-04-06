@@ -93,7 +93,7 @@ $(function () {
                 }
             };
             
-        App.ajaxUpload(url + '?code=' + code, method, data, callbackSuccess);
+        App.ajax(url + '?code=' + code, method, data, callbackSuccess);
     });
 
     // delete

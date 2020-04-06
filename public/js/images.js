@@ -1,6 +1,7 @@
 $(function () {
     $('#image_block').click(function(){
-        $('#image_file').click();
+        // $('#image_file').click();
+        $('#image_file').trigger('click'); 
     });
     $('#image_file').change(function(){
         App.readImage(this.files[0], $('#pre_image'));
