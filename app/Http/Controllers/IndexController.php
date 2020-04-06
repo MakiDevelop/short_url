@@ -58,8 +58,13 @@ class IndexController extends Controller
             // update clicks number
             $data->clicks += 1;
             $data->save();
+            // 確認是否要轉頁
+            $isRedirect = true;
+            if (strpos($request->header('User-Agent'), 'facebook')) {
+                $isRedirect = false;
+            }
 
-            return view('url', compact('data'));
+            return view('url', compact('data', 'isRedirect'));
         }
         return redirect('/');
     }
