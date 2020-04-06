@@ -31,6 +31,9 @@ class HtmlParserService
             if (empty($metaDatas['og_title'])) {
                 $metaDatas['og_title'] = $dom->find('title')->text;
             }
+            if (strpos($url, 'drive.google') !== false && empty($metaDatas['og_image'])) {
+                $metaDatas['og_image'] = 'https://www.gstatic.com/images/branding/product/1x/drive_48dp.png';
+            }
         } catch (\Exception $e) {
 
         }
