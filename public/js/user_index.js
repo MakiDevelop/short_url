@@ -60,6 +60,12 @@ $(function () {
             $('#collapseQRCode' + num).prepend('<img src="'+ img_url +'" />');
         }
     });
+    $('[name^=analytics]').click(function(){
+        var num = $(this).data('index'),
+            code = $(this).data('code');
+        $('#collapseAnalytics' + num).collapse('toggle');
+    });
+    
 
     $('#fullModal').on('hide.bs.modal', function (e) {
         $('#code').val('')

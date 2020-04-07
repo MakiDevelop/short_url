@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        @if ($isRedirect)
+        @if (isset($isRedirect) && $isRedirect)
             <meta http-equiv="refresh" content="1;url={{$data->original_url}}" />
         @endif
         <title>Laravel</title>
