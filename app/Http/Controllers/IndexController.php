@@ -41,18 +41,30 @@ class IndexController extends Controller
     {
         $data = $this->urlRepository->getCodeForUpdate($code);
         if ($data) {
-            $os      = new Os();
-            $browser = new Browser();
+            $os          = new Os();
+            $browser     = new Browser();
+            $referralUrl = $request->server('HTTP_REFERER');
+            $referral    = 'Direct';
             // 記錄log
+            if ($referralUrl) {
+                $referralTypes = config('common.referralTypes');
+                foreach ($referralTypes as $type) {
+                    if (strpos($referralUrl, strtolower($type)) !== false) {
+                        $referral = $type;
+                        break;
+                    }
+                }
+            }
             $insertData = [
-                'us_id'       => $data->id,
-                'short_url'   => $code,
-                'referral'    => $request->server('HTTP_REFERER'),
-                'os'          => $os->getName(),
-                'browser'     => $browser->getName(),
-                'user_agenet' => $request->header('User-Agent'),
-                'ip'          => $request->ip(),
-                'click_time'  => date('Y-m-d H:i:s'),
+                'us_id'        => $data->id,
+                'short_url'    => $code,
+                'referral_url' => $referralUrl,
+                'referral'     => $referral,
+                'os'           => $os->getName(),
+                'browser'      => $browser->getName(),
+                'user_agenet'  => $request->header('User-Agent'),
+                'ip'           => $request->ip(),
+                'click_time'   => date('Y-m-d H:i:s'),
             ];
             $this->logRepository->insert($insertData);
             // update clicks number
@@ -76,7 +88,7 @@ class IndexController extends Controller
         ];
         $post = $request->post();
         if (isset($post['code']) && Auth::guard('user')->check() && $post['code']) {
-            $urlData = $this->urlRepository->getByUserCode(Auth::guard('user')->id(), $post['code']);
+            $urlData   = $this->urlRepository->getByUserCode(Auth::guard('user')->id(), $post['code']);
             $validator = $this->setValidate($request, Auth::guard('user')->id(), $urlData->id);
             if ($urlData && $validator->passes()) {
                 $updateData = [
@@ -95,13 +107,13 @@ class IndexController extends Controller
                     $fileName = uniqid('img_') . '.' . $image->getClientOriginalExtension();
                     $image->move(public_path('/image/url/'), $fileName);
                     $updateData['og_image'] = $fileName;
-                    $response['image'] = $fileName;
+                    $response['image']      = $fileName;
                 } else {
                     $response['image'] = 'not have';
                 }
                 $response['file'] = $request->file('image_file');
                 $response['post'] = $post;
-                $isUpdate = $this->urlRepository->update($urlData->id, $updateData);
+                $isUpdate         = $this->urlRepository->update($urlData->id, $updateData);
                 if ($isUpdate) {
                     // hash tag
                     $tags = explode(',', $post['hash_tag']);
@@ -109,7 +121,7 @@ class IndexController extends Controller
                         $this->tagsRepository->processTags($urlData->id, $tags);
                     }
                     $response['success'] = true;
-                    $response['msg'] = '修改成功';
+                    $response['msg']     = '修改成功';
                 }
             } else {
                 if (empty($urlData)) {

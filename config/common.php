@@ -9,4 +9,13 @@ return [
     'socialTypes' => [
         'google'
     ],
+    'referralTypes' => [
+        'Facebook', 
+        'Twitter', 
+        'Google', 
+        'Yahoo', 
+        'LINE', 
+        'Telegram', 
+        // 'Direct', // Default
+    ],
 ];
