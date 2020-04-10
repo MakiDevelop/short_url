@@ -64,7 +64,8 @@
 
 @section('js_script')
     <script type="text/javascript" src="{{ asset('/js/moment.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" integrity="sha256-R4pqcOYV8lt7snxMQO/HSbVCFRPMdrhAFMH+vr9giYI=" crossorigin="anonymous"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" integrity="sha256-R4pqcOYV8lt7snxMQO/HSbVCFRPMdrhAFMH+vr9giYI=" crossorigin="anonymous"></script> -->
+    <script type="text/javascript" src="{{ asset('/js/chart.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/user_index.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/images.js') }}"></script>
     <script type="text/javascript" src="{{ asset('/js/analytics_chart.js') }}"></script>
