@@ -268,8 +268,7 @@ class IndexController extends Controller
                 // referral
                 $response['data']['referral'] = $this->logRepository->analyticsReferral($code);
                 // os
-                $osData                 = $this->logRepository->analyticsOs($code);
-                $response['data']['os'] = $osData->toArray();
+                $response['data']['os'] = $this->logRepository->analyticsOs($code);
 
                 $response['success'] = true;
                 $response['msg']     = '';

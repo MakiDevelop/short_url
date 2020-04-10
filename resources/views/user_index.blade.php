@@ -19,7 +19,7 @@
                         <div class="d-inline p-2">
                             <button type="button" name="copy{{ $index }}" data-index="{{ $index }}" class="btn btn-primary">複製</button>
                             <button type="button" name="qrcode{{ $index }}" data-index="{{ $index }}" class="btn btn-primary" data-toggle="collapse" data-target="#collapseQRCode{{ $index }}" aria-expanded="false" aria-controls="collapseQRCode{{ $index }}">QRCode</button>
-                            <button type="button" name="analytics{{ $index }}" data-index="{{ $index }}" data-code="{{ $item->short_url }}" class="btn btn-primary">分析</button>
+                            <button type="button" name="analytics{{ $index }}" class="btn btn-primary" data-toggle="collapse" data-target="#collapseAnalytics{{ $index }}" aria-expanded="false" aria-controls="collapseAnalytics{{ $index }}">分析</button>
                             <button type="button" name="edit{{ $index }}" data-index="{{ $index }}" data-code="{{ $item->short_url }}" class="btn btn-primary">Edit</button>
                             <button type="button" name="delete{{ $index }}" data-index="{{ $index }}" data-code="{{ $item->short_url }}" class="btn btn-danger">Delete</button>
                         </div>
@@ -37,12 +37,9 @@
                 <div class="col-sm-12 text-center collapse" id="collapseQRCode{{ $index }}">
                     
                 </div>
-                <div class="col-sm-12 text-center collapse" id="collapseAnalytics{{ $index }}">
-                    @if ($index === 0)
-                        <canvas id="myChart" style="height:160vh; width:200vw"></canvas>
-                        <canvas id="myChart2" style="height:160vh; width:200vw"></canvas>
-                    @endif
-                    222
+                <div class="col-sm-12 text-center collapse" id="collapseAnalytics{{ $index }}" data-index="{{ $index }}" data-code="{{ $item->short_url }}">
+                    <canvas id="referralChart{{ $index }}" style="height:160vh; width:200vw"></canvas>
+                    <canvas id="osChart{{ $index }}" style="height:160vh; width:200vw"></canvas>
                 </div>
             </div>
         @endforeach

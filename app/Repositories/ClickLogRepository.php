@@ -52,7 +52,7 @@ class ClickLogRepository extends BaseRepository
 
         if ($datas) {
             foreach ($datas as $index=>$data) {
-                $analyticsData['label'][$index] = $data->referral;
+                $analyticsData['label'][$index] = $data->os;
                 $analyticsData['data'][$index] = $data->num;
             }
         }

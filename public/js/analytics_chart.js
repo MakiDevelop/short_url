@@ -1,6 +1,24 @@
 $(function () {
+    var pie1Color = [
+        '#0000E3',
+        '#FF0000',
+        '#00BB00',
+        '#F9F900',
+        '#FF5809',
+        '#8F4586',
+        '#6C6C6C'
+    ],
+    pie2Color = [
+        '#6C6C6C',
+        '#8F4586',
+        '#FF5809',
+        '#F9F900',
+        '#00BB00',
+        '#FF0000',
+        '#0000E3'
+    ];
     // chart test
-    var ctx = $('#myChart');
+    var ctx = $('#referralChart0');
     pieData = {
         datasets: [{
             data: [10, 20, 30],
@@ -24,7 +42,7 @@ $(function () {
         // options: options
     });
 
-    var ctx2 = $('#myChart2');
+    var ctx2 = $('#osChart0');
     barData = {
         datasets: [{
             data: [{x:'2016-12-21', y:1},{x:'2016-12-22', y:2},{x:'2016-12-23', y:8},{x:'2016-12-24', y:11},{x:'2016-12-25', y:20}, {x:'2016-12-26', y:10}],
@@ -74,4 +92,56 @@ $(function () {
         data: barData,
         options: options
     });
+
+    $('[id^=collapseAnalytics]').on('show.bs.collapse', function (e) {
+        var url = '/index/url_analytics',
+            method = 'GET',
+            num = $(this).data('index'),
+            code = $(this).data('code'),
+            data = 'code=' + code;
+            callbackSuccess = function (response) {
+                if ($('#error_alert').is(':visible')) {
+                    $('#error_alert').attr('hidden', 'hidden');
+                }
+                
+                if ($('#delete_btn').length > 0) {
+					$('#delete_btn').prop('disabled', false);
+                }
+                if (response.success) {
+                    if (response.data.referral.label) {
+                        var ctx = 'referralChart' + num;
+                        pieData = {
+                            datasets: [{
+                                data: response.data.referral.data,
+                                backgroundColor: pie1Color
+                            }],
+                            // These labels appear in the legend and in the tooltips when hovering different arcs
+                            labels: response.data.referral.label
+                        };
+                        var myPieChart = new Chart(ctx, {
+                            type: 'pie',
+                            data: pieData,
+                            // options: options
+                        });
+                    }
+                    if (response.data.os.label) {
+                        var ctx = 'osChart' + num;
+                        pieData = {
+                            datasets: [{
+                                data: response.data.os.data,
+                                backgroundColor: pie2Color
+                            }],
+                            // These labels appear in the legend and in the tooltips when hovering different arcs
+                            labels: response.data.os.label
+                        };
+                        var myPieChart = new Chart(ctx, {
+                            type: 'pie',
+                            data: pieData,
+                            // options: options
+                        });
+                    }
+                }
+            };
+        App.ajax(url, method, data, callbackSuccess);
+    })
 });
