@@ -233,23 +233,6 @@ class IndexController extends Controller
         return response()->json($response);
     }
 
-    public function urlUpdate(Request $request)
-    {
-        $response = [
-            'success' => false,
-            'msg'     => '請確認資料是否正確!',
-        ];
-        if (Auth::guard('user')->check()) {
-
-            $post = $request->input();
-
-            $tags = explode(',', $post['hash_tag']);
-            if (count($tags)) {
-                $this->tagsRepository->processTags($urlData->id, $tags);
-            }
-        }
-    }
-
     public function urlDelete(Request $request)
     {
         $response = [
@@ -270,6 +253,31 @@ class IndexController extends Controller
         return response()->json($response);
     }
 
+    public function urlAnalytics(Request $request)
+    {
+        $response = [
+            'success' => false,
+            'data'    => [],
+            'msg'     => '請確認資料是否正確!',
+        ];
+        if (Auth::guard('user')->check()) {
+            $code    = $request->query('code');
+            $urlData = $this->urlRepository->getByUserCode(Auth::guard('user')->id(), $code);
+            if ($urlData) {
+                // 取得分析資料
+                // referral
+                $response['data']['referral'] = $this->logRepository->analyticsReferral($code);
+                // os
+                $osData                 = $this->logRepository->analyticsOs($code);
+                $response['data']['os'] = $osData->toArray();
+
+                $response['success'] = true;
+                $response['msg']     = '';
+            }
+        }
+        return response()->json($response);
+    }
+
     public function test()
     {
         if (env('APP_ENV') == 'local') {
@@ -279,11 +287,14 @@ class IndexController extends Controller
 
             // $url = \App\Models\HashTags::withTrashed()->where('us_id', 14)->where('tag_name', 'Apple')->first();
             // var_dump($url);
+
+            $referralData = $this->logRepository->analyticsReferral('3b2DPwGw');
+            var_dump($referralData->toArray());
         }
 
-        $image = 'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/ipad-pro-og-202003?wid=1200&amp;hei=630&amp;fmt=jpeg&amp;qlt=95&amp;op_usm=0.5,0.5&amp;.v=1583201083141';
-        $pos   = strpos($image, 'http');
-        var_dump($pos);
+        // $image = 'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/ipad-pro-og-202003?wid=1200&amp;hei=630&amp;fmt=jpeg&amp;qlt=95&amp;op_usm=0.5,0.5&amp;.v=1583201083141';
+        // $pos   = strpos($image, 'http');
+        // var_dump($pos);
     }
 
     private function setValidate($request, $user_id = null, $id = null)

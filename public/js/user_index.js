@@ -130,4 +130,28 @@ $(function () {
             };
         App.ajax(url, method, data, callbackSuccess);
     });
+
+    // analytics
+    $('[name^=analytics]').click(function(){
+        console.log('111');
+        var url = '/index/url_analytics',
+            method = 'GET',
+            num = $(this).data('index'),
+            code = $(this).data('code'),
+            data = 'code=' + code;
+            callbackSuccess = function (response) {
+                console.log(response);
+                if ($('#error_alert').is(':visible')) {
+                    $('#error_alert').attr('hidden', 'hidden');
+                }
+                
+                if ($('#delete_btn').length > 0) {
+					$('#delete_btn').prop('disabled', false);
+                }
+                if (response.success) {
+                    
+                }
+            };
+        App.ajax(url, method, data, callbackSuccess);
+    });
 });

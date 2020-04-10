@@ -25,6 +25,9 @@
                         </div>
                     </div>
                     <div class="">
+                        <p>點擊數 : {{ $item->clicks ?? 0 }}</p>
+                    </div>
+                    <div class="">
                         <p>Tag : </p>
                         @foreach ($item->tags as $tag)
                             <span class="badge badge-secondary">{{ $tag->tag_name }}</span>

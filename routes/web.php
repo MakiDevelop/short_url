@@ -21,6 +21,7 @@ Route::get('/index/url', 'IndexController@url');
 Route::post('/index/short_url', 'IndexController@shortUrl');
 Route::post('/index/website', 'IndexController@website');
 Route::post('/index/url_delete', 'IndexController@urlDelete');
+Route::get('/index/url_analytics', 'IndexController@urlAnalytics');
 
 Route::get('/login', 'LoginController@index');
 Route::get('/login/oauth/{type?}', 'LoginController@oauth');
