@@ -84,6 +84,9 @@ $(function () {
                 if ($('#error_alert').is(':visible')) {
                     $('#error_alert').attr('hidden', 'hidden');
                 }
+                if ($('#send').length > 0) {
+					$('#send').prop('disabled', false);
+                }
                 
                 if (response.success) {
                     $('#code').val(response.data.code);
