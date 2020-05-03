@@ -6,7 +6,7 @@
         @if (isset($isRedirect) && $isRedirect)
             <meta http-equiv="refresh" content="1;url={{$data->original_url}}" />
         @endif
-        <title>Laravel</title>
+        <title>{{ $data->og_title }}</title>
 
         <meta property="og:title" content="{{ $data->og_title }}">
         <meta property="og:description" content="{{ $data->og_description }}">
