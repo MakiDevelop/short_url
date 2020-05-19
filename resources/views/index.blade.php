@@ -6,10 +6,10 @@
         @csrf
         <div class="form-group row">
             <div class="col-sm-10">
-                <input type="url" class="form-control form-control-lg" id="url" name="url" placeholder="網址">
+                <input type="url" class="form-control form-control-lg" id="url" name="url" placeholder="目的網址 例：https://www.techbang.com/posts/78218">
             </div>
             <div class="col-sm-2">
-                <button type="button" id="send" class="btn btn-primary mb-2 form-control-lg">提交</button>
+                <button type="button" id="send" class="btn btn-primary mb-2 form-control-lg">建立縮址</button>
             </div>
         </div>
     </form>

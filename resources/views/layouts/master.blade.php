@@ -4,7 +4,12 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>Laravel</title>
+        <meta property="og:title" content="CHIBA短網址"/>
+        <meta property="og:description" content="ChibaKuma的縮址服務，完全免費，歡迎大
+家多多利用，登入後有個人縮址記錄還有成效追蹤。"/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:image" content="image/ogimg.png"/>
+        <title>CHIBA短網址</title>
 
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <style>
@@ -27,41 +32,62 @@
         @yield('css_link')
 
         @if (env('APP_ENV') != 'local')
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162103785-1"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
+            <!-- Global site tag (gtag.js) - Google Analytics -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162103785-1"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
 
-            gtag('config', 'UA-162103785-1');
-        </script>
-        <!-- Facebook Pixel Code -->
-        <script>
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window,document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '2367999386825868'); 
-            fbq('track', 'PageView');
-        </script>
-        <noscript>
-            <img height="1" width="1" 
-            src="https://www.facebook.com/tr?id=2367999386825868&ev=PageView
-            &noscript=1"/>
-        </noscript>
-        <!-- End Facebook Pixel Code -->
+                gtag('config', 'UA-162103785-1');
+            </script>
+            <!-- Facebook Pixel Code -->
+            <script>
+                !function(f,b,e,v,n,t,s)
+                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                n.queue=[];t=b.createElement(e);t.async=!0;
+                t.src=v;s=b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t,s)}(window,document,'script',
+                'https://connect.facebook.net/en_US/fbevents.js');
+                fbq('init', '2367999386825868'); 
+                fbq('track', 'PageView');
+            </script>
+            <noscript>
+                <img height="1" width="1" 
+                src="https://www.facebook.com/tr?id=2367999386825868&ev=PageView
+                &noscript=1"/>
+            </noscript>
+            <!-- End Facebook Pixel Code -->
+            <!-- Matomo -->
+            <script type="text/javascript">
+                var _paq = window._paq || [];
+                /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+                _paq.push(['trackPageView']);
+                _paq.push(['enableLinkTracking']);
+                (function() {
+                    var u="//matomo.chiba.tw/";
+                    _paq.push(['setTrackerUrl', u+'matomo.php']);
+                    _paq.push(['setSiteId', '2']);
+                    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+                    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+                })();
+            </script>
+            <noscript><p><img src="//matomo.chiba.tw/matomo.php?idsite=2&amp;rec=1" style="border:0;" alt="" /></p></noscript>
+            <!-- End Matomo Code -->
         @endif
     </head>
     <body>
+        @if (env('APP_ENV') != 'local')
+            <!-- Matomo Image Tracker-->
+            <img src="http://matomo.chiba.tw/matomo.php?idsite=2&amp;rec=1" style="border:0" alt="" />
+            <!-- End Matomo -->
+        @endif
         <header>
             <!-- Fixed navbar -->
             <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-                <a class="navbar-brand" href="/">Chiba.tw</a>
+                <a class="navbar-brand" href="/">CHIBA短網址</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -80,9 +106,9 @@
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
                             @if (Auth::guard('user')->check())
-                                <a class="nav-link" href="/logout">Logout</a>
+                                <a class="nav-link" href="/logout">登出</a>
                             @else 
-                                <a class="nav-link" href="/login">Login</a>
+                                <a class="nav-link" href="/login">登入（Google）</a>
                             @endif
                         </li>
                     </ul>
