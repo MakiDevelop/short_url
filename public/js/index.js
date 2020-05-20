@@ -43,4 +43,13 @@ $(function() {
     $('#copy').click(function() {
         App.copyToClipboard('url_text')
     });
+    
+    //停用form本身的enter即submit start
+    $('#short_url_form').on('keyup keypress', function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 13) { 
+            e.preventDefault();
+            return false;
+        }
+    });
 });

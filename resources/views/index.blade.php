@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="jumbotron"> 
-    <form action="" method="post" class="">
+    <form action="" method="post" class="" id="short_url_form">
         @csrf
         <div class="form-group row">
             <div class="col-sm-10">
