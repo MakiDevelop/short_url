@@ -14,7 +14,6 @@
                     <div class="">
                         <p>您確定要刪除</p>
                         <p id="del_short_text"></p>
-                        <p>的資料?</p>
                     </div>
                 </form>
             </div>

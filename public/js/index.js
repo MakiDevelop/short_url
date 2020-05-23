@@ -32,6 +32,10 @@ $(function() {
 
                     var img_url = 'https://chart.googleapis.com/chart?cht=qr&chs=200x200&choe=UTF-8&chl=' + encodeURIComponent(response.short_url);
                     $('#collapseQRCode').prepend('<img src="' + img_url + '" />');
+                } else {
+                    if (response.err) {
+                        alert(response.msg);
+                    }
                 }
             };
         if ($('#short_url').is(':visible')) {
@@ -43,11 +47,11 @@ $(function() {
     $('#copy').click(function() {
         App.copyToClipboard('url_text')
     });
-    
+
     //停用form本身的enter即submit start
     $('#short_url_form').on('keyup keypress', function(e) {
         var keyCode = e.keyCode || e.which;
-        if (keyCode === 13) { 
+        if (keyCode === 13) {
             e.preventDefault();
             return false;
         }

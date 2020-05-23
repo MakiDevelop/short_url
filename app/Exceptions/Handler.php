@@ -46,6 +46,19 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        // CSRF
+        if ($exception instanceof \Illuminate\Session\TokenMismatchException) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'msg'     => '抱歉，您操作時間似乎已過期。 請再試一遍。',
+                ]);
+            }
+            return redirect()
+                ->back()
+                ->withErrors(['抱歉，您操作時間似乎已過期。 請再試一遍。']);
+        }
+
         return parent::render($request, $exception);
     }
 }

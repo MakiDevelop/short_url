@@ -11,7 +11,7 @@
         <meta property="og:title" content="{{ $data->og_title }}">
         <meta property="og:description" content="{{ $data->og_description }}">
         <meta property="og:image" content="{{ $data->og_image }}">
-
+        <meta property="og:type" content="website">
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
 

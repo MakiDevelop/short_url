@@ -88,16 +88,23 @@ class IndexController extends Controller
         ];
         $post = $request->post();
         if (isset($post['code']) && Auth::guard('user')->check() && $post['code']) {
+            // 修改
             $urlData   = $this->urlRepository->getByUserCode(Auth::guard('user')->id(), $post['code']);
             $validator = $this->setValidate($request, Auth::guard('user')->id(), $urlData->id);
             if ($urlData && $validator->passes()) {
                 $updateData = [
                     'original_url'   => $post['url'],
+                    'content_type'   => $post['content_type'],
                     'og_title'       => $post['title'],
                     'og_description' => $post['description'],
                     'og_image'       => $post['image'] ?? '',
                     'gacode_id'      => $post['ga_id'] ?? '',
                     'fbpixel_id'     => $post['pixel_id'] ?? '',
+                    'utm_source'     => $post['source'] ?? '',
+                    'utm_medium'     => $post['medium'] ?? '',
+                    'utm_campaign'   => $post['campaign'] ?? '',
+                    'utm_term'       => $post['term'] ?? '',
+                    'utm_content'    => $post['content'] ?? '',
                     'hashtag'        => $post['hash_tag'] ?? '',
                 ];
                 if ($request->hasFile('image_file')) {
@@ -131,6 +138,7 @@ class IndexController extends Controller
                 }
             }
         } else if (empty($post['code']) && isset($post['url'])) {
+            // 新增
             $validator = $this->setValidate($request, Auth::guard('user')->id());
             if ($validator->passes()) {
                 $code = $this->urlRepository->generateCode();
@@ -139,16 +147,22 @@ class IndexController extends Controller
                     'lu_id'        => Auth::guard('user')->id() ?? 0,
                     'original_url' => $post['url'],
                     'short_url'    => $code,
-                    'gacode_id'    => $post['ga_id'] ?? '',
-                    'fbpixel_id'   => $post['pixel_id'] ?? '',
                     'hashtag'      => $post['hash_tag'] ?? '',
                     'ip'           => $request->ip(),
                 ];
                 if (Auth::guard('user')->check()) {
                     $metaDatas = [
+                        'content_type'   => $post['content_type'],
                         'og_title'       => $post['title'],
                         'og_description' => $post['description'],
                         'og_image'       => $post['image'] ?? '',
+                        'gacode_id'      => $post['ga_id'] ?? '',
+                        'fbpixel_id'     => $post['pixel_id'] ?? '',
+                        'utm_source'     => $post['source'] ?? '',
+                        'utm_medium'     => $post['medium'] ?? '',
+                        'utm_campaign'   => $post['campaign'] ?? '',
+                        'utm_term'       => $post['term'] ?? '',
+                        'utm_content'    => $post['content'] ?? '',
                     ];
                     if ($request->hasFile('image_file')) {
                         $post  = $request->input();
@@ -159,25 +173,28 @@ class IndexController extends Controller
                         $metaDatas['og_image'] = $fileName;
                     }
                 } else {
-                    $metaDatas = $this->htmlService->metaData($post['url'], config('common.metaProperty'));
+                    $metaDatas = $this->htmlService->metaData($post['url'], config('common.metaProperty'), $code);
                 }
 
-                $insertData = array_merge($tmpData, $metaDatas);
-                $urlData    = $this->urlRepository->insert($insertData);
-
-                // hash tag
-                if (Auth::guard('user')->check()) {
-                    $tags = explode(',', $post['hash_tag']);
-                    if (count($tags)) {
-                        $this->tagsRepository->processTags($urlData->id, $tags);
+                try {
+                    $insertData = array_merge($tmpData, $metaDatas);
+                    $urlData    = $this->urlRepository->insert($insertData);
+                    // hash tag
+                    if (Auth::guard('user')->check()) {
+                        $tags = explode(',', $post['hash_tag']);
+                        if (count($tags)) {
+                            $this->tagsRepository->processTags($urlData->id, $tags);
+                        }
                     }
+                    $response['success']   = true;
+                    $response['code']      = $code;
+                    $response['short_url'] = url($code);
+                    // } catch (\Illuminate\Database\QueryException $e) {
+                } catch (\Exception $e) {
+                    $error           = $e->getMessage();
+                    $response['err'] = true;
+                    $response['msg'] = '資料錯誤請聯絡管理員';
                 }
-
-                $response = [
-                    'success'   => true,
-                    'code'      => $code,
-                    'short_url' => url($code),
-                ];
             } else {
                 $response['msg'] = implode('<br />', $validator->errors()->all());
             }
@@ -217,14 +234,20 @@ class IndexController extends Controller
                 $response = [
                     'success' => true,
                     'data'    => [
-                        'code'        => $urlData->short_url,
-                        'url'         => $urlData->original_url,
-                        'title'       => $urlData->og_title,
-                        'description' => $urlData->og_description,
-                        'image'       => $urlData->og_image,
-                        'ga_id'       => $urlData->gacode_id,
-                        'pixel_id'    => $urlData->fbpixel_id,
-                        'hashtag'     => $urlData->hashtag,
+                        'code'         => $urlData->short_url,
+                        'url'          => $urlData->original_url,
+                        'title'        => $urlData->og_title,
+                        'description'  => $urlData->og_description,
+                        'image'        => $urlData->og_image,
+                        'ga_id'        => $urlData->gacode_id,
+                        'pixel_id'     => $urlData->fbpixel_id,
+                        'utm_source'   => $urlData->utm_source,
+                        'utm_medium'   => $urlData->utm_medium,
+                        'utm_campaign' => $urlData->utm_campaign,
+                        'utm_term'     => $urlData->utm_term,
+                        'utm_content'  => $urlData->utm_content,
+                        'hashtag'      => $urlData->hashtag,
+                        'content_type' => $urlData->content_type,
                     ],
                     'msg'     => '',
                 ];
@@ -287,8 +310,29 @@ class IndexController extends Controller
             // $url = \App\Models\HashTags::withTrashed()->where('us_id', 14)->where('tag_name', 'Apple')->first();
             // var_dump($url);
 
-            $referralData = $this->logRepository->analyticsReferral('3b2DPwGw');
-            var_dump($referralData->toArray());
+            // $referralData = $this->logRepository->analyticsReferral('3b2DPwGw');
+            // var_dump($referralData->toArray());
+
+            // $url = 'https://www.apple.com/tw/';
+            // $url = 'https://i.imgur.com/gv5gkUX.jpg';
+            $url = 'https://cdn.mos.cms.futurecdn.net/sVfA5TCDJhxCeGqvuMkuiB.png';
+            $res = $this->client->request('GET', $url);
+
+            echo $res->getStatusCode();
+            echo '<br />';
+            // "200"
+            var_dump($res->getHeader('content-type'));
+            $contentType = $res->getHeader('content-type')[0];
+            var_dump($contentType);
+            // 'application/json; charset=utf8'
+
+            $path_parts = pathinfo($url);
+
+            echo $path_parts['dirname'], "<br />";
+            echo $path_parts['basename'], "<br />";
+            echo $path_parts['extension'], "<br />";
+            echo $path_parts['filename'], "<br />"; //從PHP 5.2.0開始有
+
         }
 
         // $image = 'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/ipad-pro-og-202003?wid=1200&amp;hei=630&amp;fmt=jpeg&amp;qlt=95&amp;op_usm=0.5,0.5&amp;.v=1583201083141';
