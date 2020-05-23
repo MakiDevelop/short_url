@@ -4,13 +4,22 @@ $(function() {
         if (App.isUrl($(this).val())) {
             let url = new URL($(this).val());
             let params = url.searchParams;
+            var utm = false;
             for (i = 0; i < rm_param.length; i++) {
                 if (params.has(rm_param[i])) {
+                    if (rm_param[i].search('utm_') != -1) {
+                        utm = true;
+                        var field = rm_param[i].replace('utm_', '');
+                        $('#' + field).val(params.get(rm_param[i]));
+                    }
                     params.delete(rm_param[i]);
                 }
             }
             url.search = params;
             $(this).val(url.href);
+            if (utm == true) {
+                $('#collapseUtm').collapse('show');
+            }
 
             if ($(this).data('ourl') != $(this).val()) {
                 var postUrl = '/index/website',
@@ -48,6 +57,10 @@ $(function() {
                 }
                 if (response.success) {
                     location.reload();
+                } else {
+                    if (response.err) {
+                        alert(response.msg);
+                    }
                 }
             };
         App.ajaxUpload(url, method, data, callbackSuccess);
@@ -76,6 +89,7 @@ $(function() {
         $('#code').val('')
         $('#url_form')[0].reset();
         $('#pre_image').attr('src', '');
+        $('#collapseUtm').collapse('hide');
     });
 
     // edit
@@ -85,7 +99,7 @@ $(function() {
             code = $(this).data('code'),
             data = {},
             callbackSuccess = function(response) {
-                console.log(response);
+                // console.log(response);
                 if ($('#error_alert').is(':visible')) {
                     $('#error_alert').attr('hidden', 'hidden');
                 }
@@ -109,6 +123,9 @@ $(function() {
                     $('#campaign').val(response.data.utm_campaign);
                     $('#term').val(response.data.utm_term);
                     $('#content').val(response.data.utm_content);
+                    if (response.data.utm_source || response.data.utm_medium || response.data.utm_campaign || response.data.utm_term || response.data.utm_content) {
+                        $('#collapseUtm').collapse('show');
+                    }
                     $('#fullModal').modal('show');
                 }
             };

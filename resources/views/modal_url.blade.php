@@ -49,11 +49,11 @@
                         <input type="text" class="form-control form-control-lg" id="pixel_id" name="pixel_id" placeholder="pixel id">
                     </div>
 
-                    <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                    <a class="btn btn-primary" data-toggle="collapse" href="#collapseUtm" role="button" aria-expanded="false" aria-controls="collapseUtm">
                         UTM設定
                     </a>
 
-                    <div class="collapse" id="collapseExample">
+                    <div class="collapse" id="collapseUtm">
                         <div class="form-group">
                             <label for="source" class="col-form-label">utm source</label>
                             <input type="text" class="form-control form-control-lg" id="source" name="source" placeholder="utm source">
