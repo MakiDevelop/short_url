@@ -21,6 +21,24 @@
                     <div class="">
                         短網址：<p id="url_text{{ $index }}" class="d-inline"><a href="{{ url($item->short_url) }}" target="_blank">{{ url($item->short_url) }}</a></p>
                         <div class="d-inline p-2">
+	                        <div class="dropdown">
+		                        <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		                        	分享至 
+		                        </button>
+		                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+									<a class="dropdown-item" href="https://www.facebook.com/sharer/sharer.php?u={{ url($item->short_url) }}" target="_blank">Facebook</a>
+									<a class="dropdown-item" href="http://www.facebook.com/dialog/send?app_id=867277569999349&amp;link={{ url($item->short_url) }}&amp;redirect_uri={{ url($item->short_url) }}" target="_blank">Messenger</a>
+									<a class="dropdown-item" href="https://twitter.com/intent/tweet?text={{ url($item->short_url) }}" target="_blank">Twitter</a>
+									<a class="dropdown-item" href="http://www.plurk.com/?qualifier=shares&amp;status={{ url($item->short_url) }}" target="_blank">Plurk</a>
+									<a class="dropdown-item" href="https://social-plugins.line.me/lineit/share?url={{ url($item->short_url) }}" target="_blank">LINE</a>
+						  		</div>
+							</div> 
+<!--
+	                        <button type="button" name="sharefb{{ $index }}" data-index="{{ $index }}" class="btn btn-primary" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u={{ url($item->short_url) }}');">分享至FB</button>
+	                        <button type="button" name="sharefb{{ $index }}" data-index="{{ $index }}" class="btn btn-dark" onclick="window.open('https://twitter.com/intent/tweet?text={{ url($item->short_url) }}');">分享至推特</button>
+	                        <button type="button" name="sharefb{{ $index }}" data-index="{{ $index }}" class="btn btn-warning" onclick="window.open('http://www.plurk.com/?qualifier=shares&amp;status={{ url($item->short_url) }}');">分享至噗浪</button>
+	                        <button type="button" name="sharefb{{ $index }}" data-index="{{ $index }}" class="btn btn-success" onclick="window.open('https://social-plugins.line.me/lineit/share?url={{ url($item->short_url) }}');">分享至LINE</button>
+-->
                             <button type="button" name="copy{{ $index }}" data-index="{{ $index }}" class="btn btn-primary">複製</button>
                             <button type="button" name="qrcode{{ $index }}" data-index="{{ $index }}" class="btn btn-primary" data-toggle="collapse" data-target="#collapseQRCode{{ $index }}" aria-expanded="false" aria-controls="collapseQRCode{{ $index }}">QRCode</button>
                             <button type="button" name="analytics{{ $index }}" class="btn btn-primary" data-toggle="collapse" data-target="#collapseAnalytics{{ $index }}" aria-expanded="false" aria-controls="collapseAnalytics{{ $index }}">分析</button>

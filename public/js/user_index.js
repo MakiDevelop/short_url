@@ -35,6 +35,7 @@ $(function() {
                                 $('#image').val(response.data.og_image);
                             }
                             $('#content_type').val(response.data.content_type);
+                            //alert(JSON.stringify(response.data));
                         }
                     };
                 App.ajax(postUrl, method, data, callbackSuccess);
@@ -65,10 +66,20 @@ $(function() {
             };
         App.ajaxUpload(url, method, data, callbackSuccess);
     });
+    
+    //分享至FB（未完成，在blade暫時用onclick）
+    $('[name^=sharefb]').click(function() {
+        var target_id = 'url_text' + $(this).data('index');
+        
+    });
+    
+    //複製
     $('[name^=copy]').click(function() {
         var target_id = 'url_text' + $(this).data('index');
         App.copyToClipboard(target_id);
     });
+    
+    //QRCode
     $('[name^=qrcode]').click(function() {
         var num = $(this).data('index'),
             target_id = '#url_text' + num;
@@ -78,6 +89,8 @@ $(function() {
             $('#collapseQRCode' + num).prepend('<img src="' + img_url + '" />');
         }
     });
+    
+    //分析
     $('[name^=analytics]').click(function() {
         var num = $(this).data('index'),
             code = $(this).data('code');
@@ -92,7 +105,7 @@ $(function() {
         $('#collapseUtm').collapse('hide');
     });
 
-    // edit
+    //編輯
     $('[name^=edit]').click(function() {
         var url = '/index/url',
             method = 'GET',
@@ -133,7 +146,7 @@ $(function() {
         App.ajax(url + '?code=' + code, method, data, callbackSuccess);
     });
 
-    // delete
+    //刪除
     $('[name^=delete]').click(function() {
         var num = $(this).data('index');
         $('#delete_code').val($(this).data('code'));
