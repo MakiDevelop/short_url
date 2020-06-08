@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
 use PHPHtmlParser\Dom;
 
 class HtmlParserService
@@ -16,7 +17,13 @@ class HtmlParserService
     public function metaData($url, $metaProperty, $code = '')
     {
         $metaDatas = [];
-        $response  = $this->client->request('GET', $url);
+        $options = [];
+        $cookieJar = $this->checkSiteCookie($url);
+        if ($cookieJar) {
+            $options['cookies'] = $cookieJar;
+        }
+
+        $response  = $this->client->request('GET', $url, $options);
         $contentType = $response->getHeader('content-type')[0];
         $html      = $response->getBody();
         try {
@@ -45,6 +52,17 @@ class HtmlParserService
 
         }
         return $metaDatas;
+    }
+
+    private function checkSiteCookie($url)
+    {
+        $cookieJar = '';
+        if (strpos($url, 'ptt.cc') !== false) {
+            $cookieJar = CookieJar::fromArray([
+                'over18' => '1'
+            ], 'www.ptt.cc');
+        }
+        return $cookieJar;
     }
 
     private function processMetaData()

@@ -315,23 +315,28 @@ class IndexController extends Controller
 
             // $url = 'https://www.apple.com/tw/';
             // $url = 'https://i.imgur.com/gv5gkUX.jpg';
-            $url = 'https://cdn.mos.cms.futurecdn.net/sVfA5TCDJhxCeGqvuMkuiB.png';
-            $res = $this->client->request('GET', $url);
+            // $url = 'https://cdn.mos.cms.futurecdn.net/sVfA5TCDJhxCeGqvuMkuiB.png';
+            $url = 'https://www.ptt.cc/bbs/Gossiping/M.1586294016.A.CA6.html';
 
-            echo $res->getStatusCode();
-            echo '<br />';
-            // "200"
-            var_dump($res->getHeader('content-type'));
-            $contentType = $res->getHeader('content-type')[0];
-            var_dump($contentType);
+            $metaDatas = $this->htmlService->metaData($url, config('common.metaProperty'));
+            var_dump($metaDatas);
+
+            // $res = $this->client->request('GET', $url);
+
+            // echo $res->getStatusCode();
+            // echo '<br />';
+            // // "200"
+            // var_dump($res->getHeader('content-type'));
+            // $contentType = $res->getHeader('content-type')[0];
+            // var_dump($contentType);
             // 'application/json; charset=utf8'
 
-            $path_parts = pathinfo($url);
+            // $path_parts = pathinfo($url);
 
-            echo $path_parts['dirname'], "<br />";
-            echo $path_parts['basename'], "<br />";
-            echo $path_parts['extension'], "<br />";
-            echo $path_parts['filename'], "<br />"; //從PHP 5.2.0開始有
+            // echo $path_parts['dirname'], "<br />";
+            // echo $path_parts['basename'], "<br />";
+            // echo $path_parts['extension'], "<br />";
+            // echo $path_parts['filename'], "<br />"; //從PHP 5.2.0開始有
 
         }
 
