@@ -11,7 +11,9 @@ class HtmlParserService
     protected $client;
     public function __construct()
     {
-        $this->client = new Client();
+        $this->client = new Client(['defaults' => [
+            'verify' => false
+        ]]);
     }
 
     public function metaData($url, $metaProperty, $code = '')
