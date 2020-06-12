@@ -16,9 +16,17 @@ class UrlShortenerRepository extends BaseRepository
 
     public function list($params = [])
     {
-        return $this->model->where('lu_id', $params['lu_id'])
-                ->orderBy('id', 'desc')
-                ->paginate(config('constants.per_page'));
+        $query = $this->model->where('lu_id', $params['lu_id'])
+                ->orderBy('id', 'desc');
+                
+        if (!empty($params['keyword'])) {
+            $query->leftJoin('hash_tags', 'url_shortener.id', '=', 'hash_tags.us_id')
+                ->where('url_shortener.og_title', 'like', '%' . $params['keyword'] . '%')
+                ->orWhere('hash_tags.tag_name', 'like', '%' . $params['keyword'] . '%');
+        }
+                
+        return $query->select('url_shortener.*')
+                    ->paginate(config('constants.per_page'));
     }
 
     public function generateCode($num = 8)

@@ -2,6 +2,18 @@
 
 @section('content')
 <div class="jumbotron"> 
+    <form action="" method="get" class="" id="search_form">
+        <div class="form-group row">
+            <div class="col-sm-10">
+                <input required type="text" class="form-control form-control-lg" id="keyword" name="keyword" placeholder="">
+            </div>
+            <div class="col-sm-2">
+                <button type="submit" id="search" class="btn btn-primary mb-2 form-control-lg">查詢</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="jumbotron"> 
     <div class="text-right">
         <button type="button" id="short" class="btn btn-primary" data-toggle="modal" data-target="#fullModal">建立短網址</button>
     </div>
