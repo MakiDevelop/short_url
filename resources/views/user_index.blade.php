@@ -5,7 +5,7 @@
     <form action="" method="get" class="" id="search_form">
         <div class="form-group row">
             <div class="col-sm-10">
-                <input required type="text" class="form-control form-control-lg" id="keyword" name="keyword" placeholder="">
+                <input required type="text" class="form-control form-control-lg" id="keyword" name="keyword" placeholder="標題、標籤關鍵字查詢">
             </div>
             <div class="col-sm-2">
                 <button type="submit" id="search" class="btn btn-primary mb-2 form-control-lg">查詢</button>

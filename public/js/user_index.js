@@ -46,7 +46,7 @@ $(function() {
     $('#send').click(function() {
         var url = '/index/short_url',
             method = 'POST',
-            data = new FormData($('form')[0]),
+            data = new FormData($('#url_form')[0]),
             callbackSuccess = function(response) {
                 console.log(response);
                 if ($('#error_alert').is(':visible')) {
@@ -66,19 +66,19 @@ $(function() {
             };
         App.ajaxUpload(url, method, data, callbackSuccess);
     });
-    
+
     //分享至FB（未完成，在blade暫時用onclick）
     $('[name^=sharefb]').click(function() {
         var target_id = 'url_text' + $(this).data('index');
-        
+
     });
-    
+
     //複製
     $('[name^=copy]').click(function() {
         var target_id = 'url_text' + $(this).data('index');
         App.copyToClipboard(target_id);
     });
-    
+
     //QRCode
     $('[name^=qrcode]').click(function() {
         var num = $(this).data('index'),
@@ -89,7 +89,7 @@ $(function() {
             $('#collapseQRCode' + num).prepend('<img src="' + img_url + '" />');
         }
     });
-    
+
     //分析
     $('[name^=analytics]').click(function() {
         var num = $(this).data('index'),
