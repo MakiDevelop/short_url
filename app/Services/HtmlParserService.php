@@ -49,6 +49,9 @@ class HtmlParserService
                 if (strpos($url, 'drive.google') !== false && empty($metaDatas['og_image'])) {
                     $metaDatas['og_image'] = 'https://www.gstatic.com/images/branding/product/1x/drive_48dp.png';
                 }
+                if (parse_url($metaDatas['og_image'], PHP_URL_SCHEME) === null) {
+                    $metaDatas['og_image'] = 'https:' . $metaDatas['og_image'];
+                }
             }
         } catch (\Exception $e) {
 
