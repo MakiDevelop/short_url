@@ -30,7 +30,7 @@ services:
       - web
 
   db:
-    image: postgres:latest
+    image: postgres:16
     container_name: postgres_db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
