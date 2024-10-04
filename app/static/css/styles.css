@@ -1,0 +1,58 @@
+#drop-area {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    cursor: pointer;
+}
+
+#drop-area.highlight {
+    border-color: #666;
+}
+
+#image-preview {
+    margin-top: 15px;
+    max-width: 100%;
+    display: none;
+}
+
+/* 新增 styles.css 中的類別 */
+.content-center {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+    height: 100vh; /* 使內容在視窗高度內垂直置中 */
+    text-align: center; /* 讓文字也置中 */
+}
+
+h2, p {
+    margin-bottom: 20px; /* 添加適當的下邊距 */
+}
+
+.pagination {
+    display: flex;
+    justify-content: center; /* 确保分页控件居中 */
+    margin-bottom: 50px; /* 调整底部间距 */
+}
+
+footer {
+    position: relative;  /* 确保 footer 是在内容后面，而非覆盖 */
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    color: #6c757d;
+    font-size: 14px;
+    /* 移除 padding-bottom，避免占用过多空间 */
+    z-index: auto;
+}
+
+body {
+    min-height: 100vh; /* 视窗的最小高度 */
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;  /* 确保 main 内容区域可以扩展 */
+    padding-bottom: 80px; /* 为 main 提供足够的底部填充，避免 footer 覆盖 */
+}

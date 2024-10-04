@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="{{ og_title }}">
+    <meta property="og:description" content="{{ og_description }}">
+    <meta property="og:image"
+        content="{% if og_image and (og_image.startswith('https://') or og_image.startswith('https://')) %}{{ og_image }}{% else %}https://{{ DOMAIN }}{{ og_image }}{% endif %}">
+    <meta property="og:url" content="https://{{ DOMAIN }}/{{ short_code }}">
+    <title>{{ og_title }}</title>
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <!-- 引入 Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/jumppage.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-N6PZGNGN');</script>
+    <!-- End Google Tag Manager -->
+
+</head>
+
+<body>
+    <div class="container text-center">
+        <!-- 廣告版位 -->
+        <!-- <div class="ad-space">
+            <div class="desktop-ad"> -->
+        <!-- 桌機版廣告 -->
+        <!-- <img src="https://via.placeholder.com/970x250" alt="Desktop Ad" class="img-fluid">
+            </div>
+            <div class="mobile-ad"> -->
+        <!-- 手機版廣告 -->
+        <!-- <img src="https://via.placeholder.com/336x280" alt="Mobile Ad" class="img-fluid">
+            </div>
+        </div> -->
+        <!-- 廣告版位 -->
+        <div class="ad-space">
+            <!-- <img src="https://via.placeholder.com/970x250" alt="廣告版位 970x250"> -->
+            <div id="pixad3292adx"></div>
+            <ins class="adsbygoogle" style="display:inline-block;width:970px;height:250px" data-ad-region="falcon"
+                data-ad-client="ca-pub-6865528665029394" data-ad-slot="pixnet_pc_idle_970x250_adx_pb"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+                jQuery.ajaxSetup({ 'cache': true });
+                jQuery.getScript("//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js");
+                jQuery.ajaxSetup({ 'cache': false });
+            </script>
+        </div>
+
+        <h1 class="mt-5">即將跳轉到目標網址：</h1>
+        <h4>{{ og_title }}</h4>
+
+        <!-- 圖片處理 -->
+        {% if og_image %}
+        <img src="{% if og_image.startswith('https://') or og_image.startswith('https://') %}{{ og_image }}{% else %}https://{{ DOMAIN }}{{ og_image }}{% endif %}"
+            class="img-fluid" style="max-width: 100%;">
+        {% endif %}
+
+        <p class="lead"><span id="countdown" data-url="{{ original_url }}">10</span> 秒後會自動跳轉，或點擊下方按鈕立即前往。</p>
+        <a href="{{ original_url }}" class="btn btn-primary">立即跳轉</a>
+
+        <!-- 廣告版位 -->
+        <!-- <div class="ad-space">
+            <div class="desktop-ad"> -->
+        <!-- 桌機版廣告 -->
+        <!-- <img src="https://via.placeholder.com/970x250" alt="Desktop Ad" class="img-fluid">
+            </div>
+            <div class="mobile-ad"> -->
+        <!-- 手機版廣告 -->
+        <!-- <img src="https://via.placeholder.com/336x280" alt="Mobile Ad" class="img-fluid">
+            </div>
+        </div> -->
+
+        <!-- 廣告版位 -->
+        <div class="ad-space">
+            <!-- <img src="https://via.placeholder.com/970x250" alt="廣告版位 970x250"> -->
+            <div id="pixad3292adx"></div>
+            <ins class="adsbygoogle" style="display:inline-block;width:970px;height:250px" data-ad-region="falcon"
+                data-ad-client="ca-pub-6865528665029394" data-ad-slot="pixnet_pc_idle_970x250_adx_pb"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+                jQuery.ajaxSetup({ 'cache': true });
+                jQuery.getScript("//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js");
+                jQuery.ajaxSetup({ 'cache': false });
+            </script>
+        </div>
+
+    </div>
+
+    <!-- 引入 jQuery 和 Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <!-- 引入外部的 app.js -->
+    <script src="/static/js/app.js"></script>
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N6PZGNGN" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+</body>
+
+</html>

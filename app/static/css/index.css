@@ -1,0 +1,44 @@
+/* 讓按鈕和輸入框分開一些 */
+.input-group .form-control {
+    border-right: none; /* 移除輸入框右側的邊框，和按鈕更和諧 */
+}
+
+.input-group .btn {
+    margin-left: 0px; /* 增加按鈕和輸入框之間的間距 */
+}
+
+.input-group-append {
+    display: flex;
+    align-items: center;
+}
+
+.ad-space {
+    text-align: center;
+    margin: 20px 0;
+}
+.desktop-ad {
+    display: none;
+}
+.mobile-ad {
+    display: none;
+}
+@media (min-width: 768px) {
+    .desktop-ad {
+        display: block;
+    }
+}
+@media (max-width: 767px) {
+    .mobile-ad {
+        display: block;
+    }
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    color: #6c757d;
+    font-size: 14px;
+}
