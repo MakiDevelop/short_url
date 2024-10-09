@@ -20,6 +20,8 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
+    is_admin = Column(Boolean, default=False)
     
     # 與 URL 的一對多關係
     urls = relationship("URL", back_populates="user")

@@ -2,10 +2,10 @@ import logging
 from fastapi import FastAPI, Request, Depends, HTTPException, Form, UploadFile, File, Query
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import desc, or_
+from sqlalchemy import desc, or_, func
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
-from fastapi.responses import StreamingResponse, RedirectResponse, HTMLResponse, JSONResponse
+from fastapi.responses import StreamingResponse, RedirectResponse, HTMLResponse, JSONResponse, FileResponse
 from authlib.integrations.starlette_client import OAuth
 from starlette.middleware.sessions import SessionMiddleware
 import os
@@ -27,12 +27,13 @@ from slowapi.util import get_remote_address
 from slowapi.middleware import SlowAPIMiddleware
 
 #python3 引用模組的寫法要用 from .檔名 import 方法／類別
-from .schemas import URLRequest
+from .schemas import *
 from .Model import URL, get_db, get_url_by_short_code, record_click 
 from .redis_connection import get_cached_url, set_cached_url  # 从 redis_connection 导入函数
 
 import mimetypes
 from urllib.parse import urlparse
+from typing import List
 
 # 初始化Limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -83,6 +84,12 @@ oauth.register(
     server_metadata_url="https://accounts.google.com/.well-known/openid-configuration"
 )
 
+# 处理根目录的 robots.txt 文件
+@app.get("/robots.txt")
+async def robots():
+    file_path = os.path.join(os.getcwd(), "app/robots.txt")  # 确认路径指向项目根目录的 robots.txt
+    return FileResponse(file_path)
+
 # 登入路由
 @app.get("/login")
 async def login(request: Request):
@@ -120,6 +127,7 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
     # 设置用户的会话信息（假设你有SessionMiddleware来管理会话）
     request.session['user_id'] = user.id
     request.session['user_email'] = email
+    request.session['is_active'] = user.is_active
 
     # 重定向到 dashboard
     return RedirectResponse(url="/dashboard")
@@ -128,6 +136,10 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
 @app.get("/dashboard")
 @limiter.limit("10/minute")
 async def dashboard(request: Request, page: int = Query(1, ge=1), search_query: str = None, db: Session = Depends(get_db)):
+    is_active = request.session.get('is_active')
+    
+    if  is_active == False:
+        return RedirectResponse(url="/?error=inactive", status_code=302)
     user_id = request.session.get('user_id')
     if not user_id:
         # raise HTTPException(status_code=401, detail="未登入")
@@ -450,10 +462,12 @@ async def analyze_clicks(short_code: str, db: Session = Depends(get_db)):
 # 未登入用戶首頁
 @app.get("/")
 async def read_index(request: Request, db: Session = Depends(get_db)):
+
+    in_active = request.session.get('inactive')
     # 檢查使用者是否已登入
     user_id = request.session.get('user_id')
     
-    if user_id:
+    if user_id and in_active == True:
         # 使用者已登入，重定向到 /dashboard
         return RedirectResponse(url="/dashboard")
     
@@ -512,6 +526,76 @@ async def generate_qrcode(request: Request, short_code: str):
     img.save(buf)
     buf.seek(0)
     return StreamingResponse(buf, media_type="image/png")
+
+# 指派為管理員
+@app.post("/admin/assignadmin")
+async def assign_admin(request: AdminRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == request.user_id).first()
+    if not user:
+        return {"error": "User not found"}
+    
+    user.is_admin = True
+    db.commit()
+    
+    return {"status": "User assigned as admin", "is_admin": user.is_admin}
+
+# 解除指派管理員
+@app.post("/admin/deassignadmin")
+async def deassign_admin(request: AdminRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == request.user_id).first()
+    if not user:
+        return {"error": "User not found"}
+    
+    user.is_admin = False
+    db.commit()
+    
+    return {"status": "User deassigned from admin", "is_admin": user.is_admin}
+
+# 停用指定用戶
+@app.post("/admin/deactivate")
+async def deactivate_user(request: AdminRequest, db: Session = Depends(get_db)):
+    # 查询用户是否存在
+    user = db.query(User).filter(User.id == request.user_id).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # 将用户状态设为停用
+    user.is_active = False
+    db.commit()
+
+    return {"status": "User deactivated", "user_id": user.id}
+
+# 啟用指定用戶
+@app.post("/admin/activate")
+async def activate_user(request: AdminRequest, db: Session = Depends(get_db)):
+    # 查询用户是否存在
+    user = db.query(User).filter(User.id == request.user_id).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # 将用户状态设为停用
+    user.is_active = True
+    db.commit()
+
+    return {"status": "User activated", "user_id": user.id}
+
+
+# 模擬一個身份驗證系統來獲取當前登錄用戶
+# 實際情況可以使用 JWT 或 OAuth2 來認證用戶
+def get_current_user(token: str, db: Session = Depends(get_db)):
+    # 假設 `token` 解碼後獲取到用戶的ID
+    user = db.query(User).filter(User.token == token).first()  # 這是假設 token 存在 User 模型
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authentication credentials")
+    return user
+
+# 檢查用戶是否爲管理員
+def admin_required(current_user: User = Depends(get_current_user)):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    return current_user
 
 # 縮網址圖片處理
 def handle_image_upload(image: UploadFile, og_image_url: str, upload_dir: str):
@@ -596,7 +680,96 @@ def parse_og_data(url):
     except Exception as e:
         print(f"Error parsing OG data: {e}")
         return {"title": None, "description": None, "image": None}
+
+# 管理後台
+@app.get("/admin/dashboard")
+async def admin_dashboard(request: Request, db: Session = Depends(get_db)):
+    user_id = request.session.get("user_id")
     
+    if not user_id:
+        return RedirectResponse(url="/login", status_code=303)
+    
+    user = db.query(User).filter(User.id == user_id).first()
+    
+    if not user or not user.is_admin:
+        raise HTTPException(status_code=403, detail="無權訪問")
+
+    return templates.TemplateResponse("admin_dashboard.html", {"request": request})
+
+# 取得全部的用戶
+@app.get("/api/admin/users", response_model=List[UserResponse])
+def get_all_users(db: Session = Depends(get_db), page: int = 1, page_size: int = 10):
+    offset = (page - 1) * page_size
+    users = db.query(User).offset(offset).limit(page_size).all()
+    return users
+
+# 取得全部的短網址
+@app.get("/api/admin/urls", response_model=List[ShortUrlResponse])
+def get_all_urls(db: Session = Depends(get_db), page: int = 1, page_size: int = 10):
+    offset = (page - 1) * page_size
+    urls = db.query(URL).order_by(desc(URL.created_at)).offset(offset).limit(page_size).all()
+
+    print("Query returned URLs:", [url.created_at for url in urls])  # 临时使用 print
+
+    # 构建返回数据，包括聚合点击次数
+    response_data = []
+    for url in urls:
+        click_count = db.query(func.sum(Click.click_count)).filter(Click.url_id == url.id).scalar() or 0
+        response_data.append({
+            "id": url.id,
+            "short_code": url.short_code,
+            "original_url": url.original_url,
+            "click_count": click_count
+        })
+
+    return response_data
+
+# 指定用戶的查詢
+@app.post("/api/admin/users", response_model=List[UserResponse])
+def search_users(request: UserQueryRequest, db: Session = Depends(get_db)):
+    query_string = request.query_string
+
+    # 使用 ilike 进行模糊查询
+    users = db.query(User).filter(
+        (User.email.ilike(f"%{query_string}%")) | (User.name.ilike(f"%{query_string}%"))
+    ).all()
+
+    if not users:
+        raise HTTPException(status_code=404, detail="No users found")
+
+    return users
+
+# 指定短網址的查詢
+@app.post("/api/admin/urls", response_model=List[ShortUrlResponse])
+def search_short_urls(request: UrlQueryRequest, db: Session = Depends(get_db)):
+    # 获取传入的查询字符串
+    query = request.query_string
+
+    # 执行模糊查询，使用 original_url 和 short_code 进行模糊匹配
+    short_urls = db.query(URL).filter(
+        or_(
+            URL.original_url.ilike(f"%{query}%"),
+            URL.short_code.ilike(f"%{query}%")
+        )
+    ).all()
+
+    # 检查是否查询到了任何结果
+    if not short_urls:
+        raise HTTPException(status_code=404, detail="No matching short URLs found")
+
+    # 聚合点击次数
+    response_data = []
+    for url in short_urls:
+        click_count = db.query(func.sum(Click.click_count)).filter(Click.url_id == url.id).scalar() or 0
+        response_data.append({
+            "id": url.id,
+            "short_code": url.short_code,
+            "original_url": url.original_url,
+            "click_count": click_count
+        })
+
+    return response_data
+
 # 存取短網址
 @app.get("/{short_code}")
 async def redirect_with_delay(short_code: str, request: Request, db: Session = Depends(get_db)):

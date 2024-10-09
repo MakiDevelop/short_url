@@ -1,0 +1,11 @@
+table {
+    table-layout: fixed; /* 固定表格布局 */
+    width: 100%; /* 让表格占满可用宽度 */
+}
+
+th, td {
+    word-wrap: break-word; /* 如果单词过长，会在单词内断行 */
+    word-break: break-all; /* 单词太长时强制断行 */
+    white-space: normal; /* 允许文字换行 */
+    max-width: 200px; /* 设置最大宽度 */
+}

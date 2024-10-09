@@ -7,6 +7,14 @@ $(document).ready(function() {
         checkDevice();
     });
 
+    // 檢查URL參數中的錯誤
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    if (error === 'inactive') {
+        // 顯示模態框，告知使用者帳號已停用
+        $('#inactiveModal').modal('show');
+    }
+
     $('#create-url-form').on('submit', function(event) {
         event.preventDefault();  // 防止表單的預設送出行為
 

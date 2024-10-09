@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理後台 - 1px.tw工具箱</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">管理後台</h1>
+
+        <!-- 搜尋區域 -->
+        <form id="searchForm" class="form-inline mb-4">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchInput" placeholder="輸入要搜尋的關鍵字">
+                <div class="input-group-append">
+                    <select class="custom-select" id="searchType">
+                        <option value="user" selected>搜尋用戶</option>
+                        <option value="url">搜尋短網址</option>
+                    </select>
+                    <button class="btn btn-outline-secondary" type="button" onclick="performSearch()">搜尋</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- 搜尋結果區域 -->
+        <div id="searchResult" class="mt-4">
+            <p>搜尋結果會顯示在這裡。</p>
+        </div>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function performSearch() {
+            const searchType = document.getElementById('searchType').value;
+            const searchInput = document.getElementById('searchInput').value;
+            const searchResultDiv = document.getElementById('searchResult');
+    
+            if (searchType === 'user') {
+                searchUsers(searchInput);
+            } else if (searchType === 'url') {
+                searchUrls(searchInput);
+            }
+        }
+    
+        // 搜索用户
+        function searchUsers(query) {
+            fetch('/api/admin/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query_string: query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayUserResults(data);
+            })
+            .catch(error => {
+                console.error('Error fetching users:', error);
+            });
+        }
+    
+        // 显示用户搜索结果
+        function displayUserResults(users) {
+            const searchResultDiv = document.getElementById('searchResult');
+            let html = `
+                <h3>用戶搜尋結果</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>用戶ID</th>
+                            <th>用戶Email</th>
+                            <th>狀態</th>
+                            <th>身份</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            users.forEach(user => {
+                const statusText = user.is_active ? '啟用中' : '停用中';
+                const adminText = user.is_admin ? '管理員' : '一般用戶';
+    
+                html += `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.email}</td>
+                        <td><span>${statusText}</span></td>
+                        <td><span>${adminText}</span></td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="toggleUserStatus(${user.id}, ${user.is_active})">
+                                ${user.is_active ? '停用' : '啟用'}
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="toggleAdmin(${user.id}, ${user.is_admin})">
+                                ${user.is_admin ? '解除管理員' : '指定為管理員'}
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+    
+            html += `</tbody></table>`;
+            searchResultDiv.innerHTML = html;
+        }
+    
+        // 搜索短網址
+        function searchUrls(query) {
+            fetch('/api/admin/urls', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query_string: query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayUrlResults(data);
+            })
+            .catch(error => {
+                console.error('Error fetching URLs:', error);
+            });
+        }
+    
+        // 显示短網址搜索结果
+        function displayUrlResults(urls) {
+            const searchResultDiv = document.getElementById('searchResult');
+            let html = `
+                <h3>短網址搜尋結果</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>短網址ID</th>
+                            <th>目的網址</th>
+                            <th>短網址</th>
+                            <th>點擊數</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+    
+            urls.forEach(url => {
+                html += `
+                    <tr>
+                        <td>${url.id}</td>
+                        <td><a href="${url.original_url}" target="_blank">${url.original_url}</a></td>
+                        <td><a href="https://1px.tw/${url.short_code}" target="_blank">https://1px.tw/${url.short_code}</a></td>
+                        <td>${url.click_count}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="deleteUrl(${url.id})">刪除</button>
+                        </td>
+                    </tr>`;
+            });
+    
+            html += `</tbody></table>`;
+            searchResultDiv.innerHTML = html;
+        }
+    
+        // 模拟停用/启用用户
+        function toggleUserStatus(userId, isActive) {
+            const action = isActive ? '/admin/deactivate' : '/admin/activate';
+            fetch(action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.status);
+                performSearch();  // 重新搜索以更新结果
+            })
+            .catch(error => {
+                console.error('Error toggling user status:', error);
+            });
+        }
+    
+        // 模拟指定/解除管理员
+        function toggleAdmin(userId, isAdmin) {
+            const action = isAdmin ? '/admin/deassignadmin' : '/admin/assignadmin';
+            fetch(action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.status);
+                performSearch();  // 重新搜索以更新结果
+            })
+            .catch(error => {
+                console.error('Error toggling admin status:', error);
+            });
+        }
+    
+        // 模拟删除短网址
+        function deleteUrl(urlId) {
+            fetch(`/api/admin/urls/${urlId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('短網址已被刪除');
+                performSearch();  // 重新搜索以更新结果
+            })
+            .catch(error => {
+                console.error('Error deleting URL:', error);
+            });
+        }
+    </script>
+</body>
+
+</html>
