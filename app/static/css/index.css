@@ -42,3 +42,35 @@ footer {
     color: #6c757d;
     font-size: 14px;
 }
+
+.top-clicks-section {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+}
+
+#top-clicks-list {
+    display: flex;
+    flex-wrap: wrap; /* 允許換行 */
+    justify-content: space-around; /* 讓每行的項目平均分布 */
+}
+
+.top-click-item {
+    width: 30%; /* 每行 3 個項目 */
+    margin-bottom: 20px;
+    padding: 10px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.top-click-item h4 {
+    margin: 10px 0;
+    color: #007bff;
+}
+
+.top-click-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}

@@ -25,3 +25,14 @@ def set_cached_url(short_code, original_url, url_id, og_title, og_description, o
         "direct_redirect": direct_redirect
     }
     r.set(short_code, json.dumps(cached_data), ex=86400)  # 設置 1 天的過期時間
+
+# 获取上周热门短网址的缓存
+def get_top_clicks_last_week_cache():
+    cached_data = r.get("top_clicks_last_week")
+    if cached_data:
+        return json.loads(cached_data)
+    return None
+
+# 将上周热门短网址结果写入 Redis，并设定 24 小时过期时间
+def set_top_clicks_last_week_cache(top_urls):
+    r.set("top_clicks_last_week", json.dumps(top_urls), ex=86400)  # 設置 1 天的過期時間

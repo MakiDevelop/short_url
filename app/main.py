@@ -17,7 +17,8 @@ from io import BytesIO
 from .Model import *
 from bs4 import BeautifulSoup
 import requests
-
+from datetime import datetime, timedelta
+from requests.exceptions import SSLError, RequestException
 from collections import Counter
 
 # 防止DDoS
@@ -28,8 +29,8 @@ from slowapi.middleware import SlowAPIMiddleware
 
 #python3 引用模組的寫法要用 from .檔名 import 方法／類別
 from .schemas import *
-from .Model import URL, get_db, get_url_by_short_code, record_click 
-from .redis_connection import get_cached_url, set_cached_url  # 从 redis_connection 导入函数
+from .Model import URL, Click, OGData, get_db, get_url_by_short_code, record_click 
+from .redis_connection import *  # 从 redis_connection 导入函数
 
 import mimetypes
 from urllib.parse import urlparse
@@ -88,6 +89,12 @@ oauth.register(
 @app.get("/robots.txt")
 async def robots():
     file_path = os.path.join(os.getcwd(), "app/robots.txt")  # 确认路径指向项目根目录的 robots.txt
+    return FileResponse(file_path)
+
+# 处理根目录的 ads.txt 文件
+@app.get("/ads.txt")
+async def ads():
+    file_path = os.path.join(os.getcwd(), "app/ads.txt")  # 确认路径指向项目根目录的 ads.txt
     return FileResponse(file_path)
 
 # 登入路由
@@ -769,6 +776,92 @@ def search_short_urls(request: UrlQueryRequest, db: Session = Depends(get_db)):
         })
 
     return response_data
+
+# 首頁用function start
+@app.get("/api/top_clicks_last_week")
+def get_top_clicks_last_week(limit: int = 9, db: Session = Depends(get_db)):
+    # 从 Redis 检查是否已有缓存
+    cached_data = get_top_clicks_last_week_cache()
+    
+    if cached_data:
+        # 如果有缓存则直接返回
+        return cached_data
+
+    # 如果 Redis 中没有缓存，查询数据库
+    one_week_ago = datetime.utcnow() - timedelta(days=7)
+    
+    results = (
+        db.query(URL, OGData, func.count(Click.id).label('click_count'))
+        .join(Click, URL.id == Click.url_id)
+        .outerjoin(OGData, OGData.url_id == URL.id)
+        .filter(Click.clicked_at >= one_week_ago)
+        .group_by(URL.id, OGData.id, OGData.url_id, OGData.title, OGData.description, OGData.image)  # 将所有 OGData 字段加入 GROUP BY
+        .order_by(func.count(Click.id).desc())  # 按點擊次數排序
+        .limit(limit)
+        .all()
+    )
+    
+    top_urls = []
+    
+    for url, og_data, click_count in results:
+        # 獲取初始的 title 和 og_image
+        title = og_data.title if og_data and og_data.title else "No Title"
+        image = og_data.image if og_data and og_data.image else "default_image.png"
+        
+        # 如果 title 為 "No Title" 或 image 為 "default_image.png"，即時抓取 OG Data
+        if title == "No Title" or image == "default_image.png":
+            online_og_data = fetch_og_data(url.original_url)  # 拉取線上的 OG Data
+            title = online_og_data.get("title", title)  # 如果抓取成功就更新 title
+            image = online_og_data.get("image", image)  # 如果抓取成功就更新 image
+        
+        top_urls.append({
+            "short_code": url.short_code,
+            "title": title,
+            "og_image": image,
+            "click_count": click_count
+        })
+    
+    # 将结果写入 Redis 缓存，并设置 24 小时过期时间
+    set_top_clicks_last_week_cache(top_urls)
+    
+    return top_urls
+
+
+def fetch_og_data(url: str):
+    try:
+        # 發送請求並抓取內容
+        response = requests.get(url, timeout=10)  # 加入 timeout 防止請求長時間卡住
+        response.raise_for_status()  # 如果發生HTTP錯誤，會拋出異常
+        soup = BeautifulSoup(response.content, "html.parser")
+        
+        # 提取標題
+        title = soup.title.string if soup.title else "No Title"
+        
+        # 提取 og:image
+        og_image = soup.find("meta", property="og:image")
+        og_image_url = og_image["content"] if og_image else None
+
+        return {
+            "title": title,
+            "image": og_image_url
+        }
+
+    except SSLError:
+        # 捕捉 SSL 錯誤，並選擇忽略（pass）
+        print(f"SSL error occurred while fetching OG data from {url}")
+        pass  # 可以記錄日志或選擇忽略
+
+    except RequestException as e:
+        # 捕捉其他請求相關錯誤
+        print(f"Error occurred while fetching OG data from {url}: {e}")
+        pass  # 可以記錄日志或選擇忽略
+
+    # 返回默認值以確保函數有返回
+    return {
+        "title": "No Title",
+        "image": "default_image.png"
+    }
+# 首頁用function end
 
 # 存取短網址
 @app.get("/{short_code}")

@@ -15,7 +15,7 @@
     <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
     <link rel="canonical" href="https://1px.tw/">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> -->
     <link rel="stylesheet" href="/static/css/index.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -29,6 +29,10 @@
                     'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
         })(window, document, 'script', 'dataLayer', 'GTM-N6PZGNGN');</script>
     <!-- End Google Tag Manager -->
+
+    <!-- 引入自動廣告JS -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1727974428384292"
+    crossorigin="anonymous"></script> -->
 
 </head>
 
@@ -74,6 +78,77 @@
                 <img id="qrcode" alt="QR Code" />
             </div>
         </div>
+        <!-- [Backup AD] 970x250 -->
+        <!-- <ins class="adsbyfalcon" data-ad-client="1" data-ad-slot="3222"
+            style="display:inline-block;width:970px;height:250px"></ins>
+        <script async src="https://falcon-asset.pixfs.net/js/adsbyfalcon.min.js"></script> -->
+
+        <div id="top-clicks-section" class="top-clicks-section">
+            <h3>上周熱門短網址</h3>
+            <div id="top-clicks-list">
+                <!-- 此處通過 JavaScript 填充熱門短網址列表 -->
+            </div>
+        </div>
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                fetch('/api/top_clicks_last_week')
+                .then(response => response.json())
+                .then(data => {
+                    const topClicksList = document.getElementById("top-clicks-list");
+                    
+                    if (data.length === 0) {
+                        topClicksList.innerHTML = "<p>上周無熱門短網址。</p>";
+                    } else {
+                        data.forEach(item => {
+                            const listItem = document.createElement("div");
+                            listItem.classList.add("top-click-item");
+            
+                            // 檢查 og_image 是否為 null 或 default_image.png，並進行替換
+                            let ogImage = item.og_image;
+                            if (!ogImage) {
+                                ogImage = "https://1px.tw/static/images/NoOGImage_50.jpg";
+                            } else if (ogImage === "default_image.png") {
+                                ogImage = "https://1px.tw/static/images/default_image.png";
+                            }
+            
+                            // 建立標題和圖片的區塊
+                            listItem.innerHTML = `
+                                <a href="/${item.short_code}" target="_blank">
+                                    <h4>${item.title}</h4>
+                                    <img src="${ogImage}" alt="${item.title}" width="150">
+                                </a>
+                            `;
+            
+                            topClicksList.appendChild(listItem);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching top clicks:", error);
+                    const topClicksList = document.getElementById("top-clicks-list");
+                    topClicksList.innerHTML = "<p>無法加載熱門短網址。</p>";
+                });
+            });
+            </script>
+
+        <!-- 廣告版位 -->
+        <ins class="adsbyfalcon" data-ad-client="1" data-ad-slot="5499" style="display:inline-block;width:970px;height:250px"></ins>
+        <script async src="https://falcon-asset.pixfs.net/js/adsbyfalcon.min.js"></script>
+
+        <!-- 廣告版位 -->
+        <div class="ad-space">
+            <!-- <img src="https://via.placeholder.com/970x250" alt="廣告版位 970x250"> -->
+            <div id="pixad3292adx"></div>
+            <ins class="adsbygoogle" style="display:inline-block;width:970px;height:250px" data-ad-region="falcon"
+                data-ad-client="ca-pub-6865528665029394" data-ad-slot="pixnet_pc_idle_970x250_adx_pb"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+                jQuery.ajaxSetup({ 'cache': true });
+                jQuery.getScript("//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js");
+                jQuery.ajaxSetup({ 'cache': false });
+            </script>
+        </div>
 
         <!-- Modal: 通用提示框 -->
         <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-labelledby="infoModalLabel"
@@ -96,7 +171,8 @@
             </div>
         </div>
 
-        <div class="modal fade" id="inactiveModal" tabindex="-1" aria-labelledby="inactiveModalLabel" aria-hidden="true">
+        <div class="modal fade" id="inactiveModal" tabindex="-1" aria-labelledby="inactiveModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -115,41 +191,26 @@
             </div>
         </div>
 
-        <!-- 廣告版位 -->
-        <div class="ad-space">
-            <!-- <img src="https://via.placeholder.com/970x250" alt="廣告版位 970x250"> -->
-            <div id="pixad3292adx"></div>
-            <ins class="adsbygoogle" style="display:inline-block;width:970px;height:250px" data-ad-region="falcon"
-                data-ad-client="ca-pub-6865528665029394" data-ad-slot="pixnet_pc_idle_970x250_adx_pb"></ins>
-            <script>
-                (adsbygoogle = window.adsbygoogle || []).push({});
-                jQuery.ajaxSetup({ 'cache': true });
-                jQuery.getScript("//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js");
-                jQuery.ajaxSetup({ 'cache': false });
-            </script>
-        </div>
+    </div>
 
-        <!-- 廣告版位 -->
-        <div class="ad-space">
-            <!-- <img src="https://via.placeholder.com/970x250" alt="廣告版位 970x250"> -->
-            <div id="pixad3292adx"></div>
-            <ins class="adsbygoogle" style="display:inline-block;width:970px;height:250px" data-ad-region="falcon"
-                data-ad-client="ca-pub-6865528665029394" data-ad-slot="pixnet_pc_idle_970x250_adx_pb"></ins>
-            <script>
-                (adsbygoogle = window.adsbygoogle || []).push({});
-                jQuery.ajaxSetup({ 'cache': true });
-                jQuery.getScript("//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js");
-                jQuery.ajaxSetup({ 'cache': false });
-            </script>
+    <!-- 短網址工具說明 -->
+    <div class="tool-description bg-light text-center py-4 mt-5" style="margin-bottom: 20px;">
+        <div class="container">
+            <h5 class="text-primary">1px.tw 短網址工具說明</h5>
+            <p class="text-muted">
+                1px.tw 短網址是一個由優像數位提供的免費短網址服務。您可以在此生成短網址，並且登入後可以管理短網址，觀察點擊數據與訪客的瀏覽器分佈。
+            </p>
+            <p class="text-muted">
+                該工具特別適合需要對外分享鏈接的情境，縮短後的網址不僅方便分享，還可以用來統計訪問數據。
+            </p>
         </div>
-
     </div>
 
     <!-- Footer -->
     <footer class="text-center mt-5">
         <p>Copyright © 2003 - 2024 優像數位媒體科技(股)公司</p>
     </footer>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- 在頁面底部引入 index.js -->
     <script src="/static/js/index.js"></script>
