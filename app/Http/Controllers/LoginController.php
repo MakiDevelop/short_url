@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Repositories\LoginUserRepository;
 use Auth;
 use Exception;
+use Illuminate\Support\Facades\Log;
 use Socialite;
 
 class LoginController extends Controller
@@ -27,16 +28,6 @@ class LoginController extends Controller
         return redirect('/');
     }
 
-    public function testo()
-    {
-        if (env('APP_ENV') == 'local') {
-            $user = \App\Models\LoginUser::find(1);
-            Auth::guard('user')->login($user);
-        }
-        
-        return redirect('/');
-    }
-
     public function oauth($type = '')
     {
         if (in_array($type, config('common.socialTypes'))) {
@@ -50,10 +41,6 @@ class LoginController extends Controller
         if (in_array($type, config('common.socialTypes'))) {
             try {
                 $oauthUser = Socialite::driver($type)->user();
-                // var_dump($oauthUser->name);
-                // var_dump($oauthUser->id);
-                // var_dump($oauthUser->email);
-                // dd($oauthUser);
 
                 $user = $this->userRepository->getByOauthID($type, $oauthUser->id);
                 if ($user) {
@@ -69,10 +56,19 @@ class LoginController extends Controller
                     ];
                     $user = $this->userRepository->insert($inserData);
                 }
+
+                Log::info('OAuth login successful', [
+                    'type' => $type,
+                    'user_id' => $user->id
+                ]);
+
                 Auth::guard('user')->login($user);
                 return redirect('/');
             } catch (Exception $e) {
-
+                Log::error('OAuth login failed', [
+                    'type' => $type,
+                    'error' => $e->getMessage()
+                ]);
             }
         }
         return redirect('/');
@@ -80,6 +76,6 @@ class LoginController extends Controller
 
     public function facebookCancel()
     {
-
+        return redirect('/login');
     }
 }

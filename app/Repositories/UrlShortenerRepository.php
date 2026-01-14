@@ -3,11 +3,14 @@
 namespace App\Repositories;
 
 use App\Models\UrlShortener;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class UrlShortenerRepository extends BaseRepository
 {
     protected $model;
+    protected $cachePrefix = 'url:';
+    protected $cacheTTL = 3600; // 1 hour
 
     public function __construct(UrlShortener $model)
     {
@@ -41,7 +44,11 @@ class UrlShortenerRepository extends BaseRepository
 
     public function getByCode($code)
     {
-        return $this->model->where('short_url', $code)->first();
+        $cacheKey = $this->cachePrefix . $code;
+
+        return Cache::remember($cacheKey, $this->cacheTTL, function () use ($code) {
+            return $this->model->where('short_url', $code)->first();
+        });
     }
 
     public function getCodeForUpdate($code)
@@ -54,4 +61,26 @@ class UrlShortenerRepository extends BaseRepository
         return $this->model->where('lu_id', $luID)->where('short_url', $code)->first();
     }
 
+    public function update($id, array $data)
+    {
+        $url = $this->model->find($id);
+        if ($url) {
+            $url->update($data);
+            $this->clearCache($url->short_url);
+            return true;
+        }
+        return false;
+    }
+
+    public function delete($url)
+    {
+        $code = $url->short_url;
+        $url->delete();
+        $this->clearCache($code);
+    }
+
+    public function clearCache($code)
+    {
+        Cache::forget($this->cachePrefix . $code);
+    }
 }

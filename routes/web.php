@@ -11,26 +11,26 @@
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
 Route::get('/', 'IndexController@index');
-Route::get('/index/test', 'IndexController@test');
 Route::get('/index/url', 'IndexController@url');
-Route::post('/index/short_url', 'IndexController@shortUrl');
-Route::post('/index/website', 'IndexController@website');
-Route::post('/index/url_delete', 'IndexController@urlDelete');
 Route::get('/index/url_analytics', 'IndexController@urlAnalytics');
 
-Route::get('/login', 'LoginController@index');
-Route::get('/login/oauth/{type?}', 'LoginController@oauth');
-Route::get('/login/oauth_back/{type?}', 'LoginController@oauthBack');
-Route::get('/login/facebook_cancel', 'LoginController@facebookCancel');
+// Rate limited routes for URL creation/modification
+Route::middleware(['throttle:30,1'])->group(function () {
+    Route::post('/index/short_url', 'IndexController@shortUrl');
+    Route::post('/index/website', 'IndexController@website');
+    Route::post('/index/url_delete', 'IndexController@urlDelete');
+});
+
+// Rate limited OAuth routes
+Route::middleware(['throttle:10,1'])->group(function () {
+    Route::get('/login', 'LoginController@index');
+    Route::get('/login/oauth/{type?}', 'LoginController@oauth');
+    Route::get('/login/oauth_back/{type?}', 'LoginController@oauthBack');
+    Route::get('/login/facebook_cancel', 'LoginController@facebookCancel');
+});
+
 Route::get('/logout', 'LoginController@logout');
-
-
-Route::get('/login/testooo', 'LoginController@testo');
 
 Route::get('/policies/privacy', 'PoliciesController@privacy');
 Route::get('/policies/terms', 'PoliciesController@terms');

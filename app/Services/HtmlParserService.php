@@ -11,9 +11,12 @@ class HtmlParserService
     protected $client;
     public function __construct()
     {
-        $this->client = new Client(['defaults' => [
-            'verify' => false
-        ]]);
+        $this->client = new Client([
+            'verify' => true,
+            'timeout' => 10,
+            'connect_timeout' => 5,
+            'http_errors' => false,
+        ]);
     }
 
     public function metaData($url, $metaProperty, $code = '')
@@ -54,7 +57,10 @@ class HtmlParserService
                 }
             }
         } catch (\Exception $e) {
-
+            \Log::warning('HtmlParserService: Failed to parse meta data', [
+                'url' => $url,
+                'error' => $e->getMessage()
+            ]);
         }
         return $metaDatas;
     }
@@ -69,10 +75,4 @@ class HtmlParserService
         }
         return $cookieJar;
     }
-
-    private function processMetaData()
-    {
-
-    }
-
 }

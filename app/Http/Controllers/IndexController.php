@@ -8,6 +8,7 @@ use App\Repositories\UrlShortenerRepository;
 use App\Services\HtmlParserService;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Sinergi\BrowserDetector\Browser;
 use Sinergi\BrowserDetector\Os;
@@ -108,18 +109,17 @@ class IndexController extends Controller
                     'hashtag'        => $post['hash_tag'] ?? '',
                 ];
                 if ($request->hasFile('image_file')) {
-                    $post  = $request->input();
                     $image = $request->file('image_file');
-                    // $fileName = $image->getClientOriginalName();
-                    $fileName = uniqid('img_') . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('/image/url/'), $fileName);
-                    $updateData['og_image'] = $fileName;
-                    $response['image']      = $fileName;
+                    $fileName = $this->handleImageUpload($image);
+                    if ($fileName) {
+                        $updateData['og_image'] = $fileName;
+                        $response['image'] = $fileName;
+                    } else {
+                        $response['image'] = 'invalid';
+                    }
                 } else {
                     $response['image'] = 'not have';
                 }
-                $response['file'] = $request->file('image_file');
-                $response['post'] = $post;
                 $isUpdate         = $this->urlRepository->update($urlData->id, $updateData);
                 if ($isUpdate) {
                     // hash tag
@@ -165,12 +165,11 @@ class IndexController extends Controller
                         'utm_content'    => $post['content'] ?? '',
                     ];
                     if ($request->hasFile('image_file')) {
-                        $post  = $request->input();
                         $image = $request->file('image_file');
-                        // $fileName = $image->getClientOriginalName();
-                        $fileName = uniqid('img_') . '.' . $image->getClientOriginalExtension();
-                        $image->move(public_path('/image/url/'), $fileName);
-                        $metaDatas['og_image'] = $fileName;
+                        $fileName = $this->handleImageUpload($image);
+                        if ($fileName) {
+                            $metaDatas['og_image'] = $fileName;
+                        }
                     }
                 } else {
                     $metaDatas = $this->htmlService->metaData($post['url'], config('common.metaProperty'), $code);
@@ -189,9 +188,13 @@ class IndexController extends Controller
                     $response['success']   = true;
                     $response['code']      = $code;
                     $response['short_url'] = url($code);
-                    // } catch (\Illuminate\Database\QueryException $e) {
                 } catch (\Exception $e) {
-                    $error           = $e->getMessage();
+                    Log::error('URL creation failed', [
+                        'url' => $post['url'] ?? null,
+                        'user_id' => Auth::guard('user')->id(),
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
                     $response['err'] = true;
                     $response['msg'] = '資料錯誤請聯絡管理員';
                 }
@@ -300,75 +303,71 @@ class IndexController extends Controller
         return response()->json($response);
     }
 
-    public function test()
-    {
-        if (env('APP_ENV') == 'local') {
-            // $urlData = $this->urlRepository->getByID(14);
-            // var_dump($urlData->toArray());
-            // var_dump($urlData->tags->toArray());
-
-            // $url = \App\Models\HashTags::withTrashed()->where('us_id', 14)->where('tag_name', 'Apple')->first();
-            // var_dump($url);
-
-            // $referralData = $this->logRepository->analyticsReferral('3b2DPwGw');
-            // var_dump($referralData->toArray());
-
-            // $url = 'https://www.apple.com/tw/';
-            // $url = 'https://i.imgur.com/gv5gkUX.jpg';
-            // $url = 'https://cdn.mos.cms.futurecdn.net/sVfA5TCDJhxCeGqvuMkuiB.png';
-            $url = 'https://www.ptt.cc/bbs/Gossiping/M.1586294016.A.CA6.html';
-
-            $metaDatas = $this->htmlService->metaData($url, config('common.metaProperty'));
-            var_dump($metaDatas);
-
-            // $res = $this->client->request('GET', $url);
-
-            // echo $res->getStatusCode();
-            // echo '<br />';
-            // // "200"
-            // var_dump($res->getHeader('content-type'));
-            // $contentType = $res->getHeader('content-type')[0];
-            // var_dump($contentType);
-            // 'application/json; charset=utf8'
-
-            // $path_parts = pathinfo($url);
-
-            // echo $path_parts['dirname'], "<br />";
-            // echo $path_parts['basename'], "<br />";
-            // echo $path_parts['extension'], "<br />";
-            // echo $path_parts['filename'], "<br />"; //從PHP 5.2.0開始有
-
-        }
-
-        // $image = 'https://store.storeimages.cdn-apple.com/8756/as-images.apple.com/is/ipad-pro-og-202003?wid=1200&amp;hei=630&amp;fmt=jpeg&amp;qlt=95&amp;op_usm=0.5,0.5&amp;.v=1583201083141';
-        // $pos   = strpos($image, 'http');
-        // var_dump($pos);
-    }
-
     private function setValidate($request, $user_id = null, $id = null)
     {
         $rules = [
-            'url' => 'required|url',
+            'url' => 'required|url|max:2048',
+            'title' => 'nullable|string|max:200',
+            'description' => 'nullable|string|max:500',
+            'hash_tag' => 'nullable|string|max:200|regex:/^[\p{L}\p{N},\s\-_]*$/u',
+            'ga_id' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\-]*$/',
+            'pixel_id' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9\-]*$/',
+            'source' => 'nullable|string|max:100',
+            'medium' => 'nullable|string|max:100',
+            'campaign' => 'nullable|string|max:100',
+            'term' => 'nullable|string|max:100',
+            'content' => 'nullable|string|max:100',
         ];
 
-        if (empty($id)) {
-
-        } else {
-
-        }
-
-        if ($user_id) {
-
+        if ($request->hasFile('image_file')) {
+            $rules['image_file'] = 'image|mimes:jpeg,png,gif,webp|max:5120';
         }
 
         $attribute = [
             'url'         => '網址',
-            'title'       => 'og:title',
-            'description' => 'og:description',
+            'title'       => '標題',
+            'description' => '描述',
+            'image_file'  => '圖片',
+            'hash_tag'    => '標籤',
+            'ga_id'       => 'GA ID',
+            'pixel_id'    => 'Pixel ID',
+            'source'      => 'UTM Source',
+            'medium'      => 'UTM Medium',
+            'campaign'    => 'UTM Campaign',
+            'term'        => 'UTM Term',
+            'content'     => 'UTM Content',
         ];
 
-        $validator = Validator::make($request->input(), $rules, [], $attribute);
+        $messages = [
+            'hash_tag.regex' => '標籤只能包含文字、數字、逗號、空格、底線和連字號',
+            'ga_id.regex' => 'GA ID 格式不正確',
+            'pixel_id.regex' => 'Pixel ID 格式不正確',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages, $attribute);
 
         return $validator;
+    }
+
+    private function handleImageUpload($image)
+    {
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        $mimeType = $image->getMimeType();
+        $extension = strtolower($image->getClientOriginalExtension());
+
+        if (!in_array($mimeType, $allowedMimes) || !in_array($extension, $allowedExtensions)) {
+            return null;
+        }
+
+        if ($image->getSize() > 5 * 1024 * 1024) {
+            return null;
+        }
+
+        $fileName = uniqid('img_') . '.' . $extension;
+        $image->move(public_path('/image/url/'), $fileName);
+
+        return $fileName;
     }
 }
