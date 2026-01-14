@@ -61,11 +61,11 @@ class UrlShortenerRepository extends BaseRepository
         return $this->model->where('lu_id', $luID)->where('short_url', $code)->first();
     }
 
-    public function update($id, array $data)
+    public function update($id, $datas)
     {
         $url = $this->model->find($id);
         if ($url) {
-            $url->update($data);
+            $url->update($datas);
             $this->clearCache($url->short_url);
             return true;
         }

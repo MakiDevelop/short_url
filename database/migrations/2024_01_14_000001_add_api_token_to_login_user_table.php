@@ -13,9 +13,11 @@ class AddApiTokenToLoginUserTable extends Migration
      */
     public function up()
     {
-        Schema::table('login_user', function (Blueprint $table) {
-            $table->string('api_token', 64)->nullable()->unique()->after('oauth_last_login');
-        });
+        if (!Schema::hasColumn('login_user', 'api_token')) {
+            Schema::table('login_user', function (Blueprint $table) {
+                $table->string('api_token', 64)->nullable()->unique()->after('oauth_last_login');
+            });
+        }
     }
 
     /**

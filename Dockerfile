@@ -11,16 +11,25 @@ RUN composer dump-autoload --optimize
 # Production stage
 FROM php:8.2-fpm-alpine
 
-# Install system dependencies
+# Install system dependencies and PHP extensions via apk (pre-compiled)
 RUN apk add --no-cache \
     nginx \
     supervisor \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    libzip-dev \
-    oniguruma-dev \
-    icu-dev \
+    libpng \
+    libjpeg-turbo \
+    freetype \
+    libzip \
+    oniguruma \
+    icu-libs \
+    # Install build dependencies
+    && apk add --no-cache --virtual .build-deps \
+        libpng-dev \
+        libjpeg-turbo-dev \
+        freetype-dev \
+        libzip-dev \
+        oniguruma-dev \
+        icu-dev \
+    # Configure and install PHP extensions (without opcache to save memory)
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j1 \
         pdo_mysql \
@@ -31,7 +40,10 @@ RUN apk add --no-cache \
         gd \
         zip \
         intl \
-        opcache
+    # Install opcache without JIT (less memory)
+    && docker-php-ext-install opcache \
+    # Cleanup build dependencies
+    && apk del .build-deps
 
 # Install Redis extension
 RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \

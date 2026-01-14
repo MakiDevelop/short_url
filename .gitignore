@@ -19,3 +19,4 @@ SERVER_INFO.md
 *.key
 *.pem
 public/info.php
+.env.prod
