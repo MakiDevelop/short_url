@@ -1,11 +1,9 @@
-<div class="modal fade" id="fullModal" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="fullModalLabel" aria-hidden="true">
+<div class="modal fade" id="fullModal" tabindex="-1" data-bs-backdrop="static" role="dialog" aria-labelledby="fullModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="fullModalLabel">短網址</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="url_form" action="" method="post" class="">
@@ -49,7 +47,7 @@
                         <input type="text" class="form-control form-control-lg" id="pixel_id" name="pixel_id" placeholder="pixel id">
                     </div>
 
-                    <a class="btn btn-primary" data-toggle="collapse" href="#collapseUtm" role="button" aria-expanded="false" aria-controls="collapseUtm">
+                    <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseUtm" role="button" aria-expanded="false" aria-controls="collapseUtm">
                         UTM設定
                     </a>
 
@@ -83,7 +81,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                 <button type="button" id="send" class="btn btn-primary">儲存</button>
             </div>
         </div>

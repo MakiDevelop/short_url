@@ -18,7 +18,7 @@ $(function() {
             url.search = params;
             $(this).val(url.href);
             if (utm == true) {
-                $('#collapseUtm').collapse('show');
+                bootstrap.Collapse.getOrCreateInstance(document.getElementById('collapseUtm')).show();
             }
 
             if ($(this).data('ourl') != $(this).val()) {
@@ -94,7 +94,7 @@ $(function() {
     $('[name^=analytics]').click(function() {
         var num = $(this).data('index'),
             code = $(this).data('code');
-        $('#collapseAnalytics' + num).collapse('toggle');
+        bootstrap.Collapse.getOrCreateInstance(document.getElementById('collapseAnalytics' + num)).toggle();
     });
 
 
@@ -102,7 +102,7 @@ $(function() {
         $('#code').val('')
         $('#url_form')[0].reset();
         $('#pre_image').attr('src', '');
-        $('#collapseUtm').collapse('hide');
+        bootstrap.Collapse.getOrCreateInstance(document.getElementById('collapseUtm')).hide();
     });
 
     //編輯
@@ -137,9 +137,9 @@ $(function() {
                     $('#term').val(response.data.utm_term);
                     $('#content').val(response.data.utm_content);
                     if (response.data.utm_source || response.data.utm_medium || response.data.utm_campaign || response.data.utm_term || response.data.utm_content) {
-                        $('#collapseUtm').collapse('show');
+                        bootstrap.Collapse.getOrCreateInstance(document.getElementById('collapseUtm')).show();
                     }
-                    $('#fullModal').modal('show');
+                    bootstrap.Modal.getOrCreateInstance(document.getElementById('fullModal')).show();
                 }
             };
 
@@ -151,7 +151,7 @@ $(function() {
         var num = $(this).data('index');
         $('#delete_code').val($(this).data('code'));
         $('#del_short_text').text($('#url_text' + num).text());
-        $('#deleteModal').modal('show');
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteModal')).show();
     });
     $('#deleteModal').on('hide.bs.modal', function(e) {
         $('#delete_code').val('');

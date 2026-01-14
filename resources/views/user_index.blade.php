@@ -14,8 +14,8 @@
     </form>
 </div>
 <div class="jumbotron"> 
-    <div class="text-right">
-        <button type="button" id="short" class="btn btn-primary" data-toggle="modal" data-target="#fullModal">建立短網址</button>
+    <div class="text-end">
+        <button type="button" id="short" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#fullModal">建立短網址</button>
     </div>
     @if (isset($lists))
         @foreach ($lists as $index => $item)
@@ -34,7 +34,7 @@
                         短網址：<p id="url_text{{ $index }}" class="d-inline"><a href="{{ url($item->short_url) }}" target="_blank">{{ url($item->short_url) }}</a></p>
                         <div class="d-inline p-2">
 	                        <div class="dropdown">
-		                        <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		                        <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 		                        	分享至 
 		                        </button>
 		                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -52,8 +52,8 @@
 	                        <button type="button" name="sharefb{{ $index }}" data-index="{{ $index }}" class="btn btn-success" onclick="window.open('https://social-plugins.line.me/lineit/share?url={{ url($item->short_url) }}');">分享至LINE</button>
 -->
                             <button type="button" name="copy{{ $index }}" data-index="{{ $index }}" class="btn btn-primary">複製</button>
-                            <button type="button" name="qrcode{{ $index }}" data-index="{{ $index }}" class="btn btn-primary" data-toggle="collapse" data-target="#collapseQRCode{{ $index }}" aria-expanded="false" aria-controls="collapseQRCode{{ $index }}">QRCode</button>
-                            <button type="button" name="analytics{{ $index }}" class="btn btn-primary" data-toggle="collapse" data-target="#collapseAnalytics{{ $index }}" aria-expanded="false" aria-controls="collapseAnalytics{{ $index }}">分析</button>
+                            <button type="button" name="qrcode{{ $index }}" data-index="{{ $index }}" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#collapseQRCode{{ $index }}" aria-expanded="false" aria-controls="collapseQRCode{{ $index }}">QRCode</button>
+                            <button type="button" name="analytics{{ $index }}" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#collapseAnalytics{{ $index }}" aria-expanded="false" aria-controls="collapseAnalytics{{ $index }}">分析</button>
                             <button type="button" name="edit{{ $index }}" data-index="{{ $index }}" data-code="{{ $item->short_url }}" class="btn btn-primary">編輯</button>
                             <button type="button" name="delete{{ $index }}" data-index="{{ $index }}" data-code="{{ $item->short_url }}" class="btn btn-danger">刪除</button>
                         </div>
@@ -64,7 +64,7 @@
                     <div class="">
                         <span>標籤：</span>
                         @foreach ($item->tags as $tag)
-                            <span class="badge badge-secondary">{{ $tag->tag_name }}</span>
+                            <span class="badge bg-secondary">{{ $tag->tag_name }}</span>
                         @endforeach
                     </div>
                 </div>
