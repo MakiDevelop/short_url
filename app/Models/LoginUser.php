@@ -29,7 +29,14 @@ class LoginUser extends Authenticatable
      *
      * @var array
      */
-    protected $fillable = ['oauth_type', 'oauth_id', 'oauth_name', 'oauth_email', 'oauth_first_time', 'oauth_last_login'];
+    protected $fillable = ['oauth_type', 'oauth_id', 'oauth_name', 'oauth_email', 'oauth_first_time', 'oauth_last_login', 'api_token'];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = ['api_token'];
 
     /**
      * Get the password for the user.
@@ -39,5 +46,17 @@ class LoginUser extends Authenticatable
     public function getAuthPassword()
     {
         return '';
+    }
+
+    /**
+     * Generate a new API token for the user.
+     *
+     * @return string
+     */
+    public function generateApiToken()
+    {
+        $this->api_token = \Illuminate\Support\Str::random(64);
+        $this->save();
+        return $this->api_token;
     }
 }

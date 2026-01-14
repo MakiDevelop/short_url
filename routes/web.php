@@ -32,6 +32,10 @@ Route::middleware(['throttle:10,1'])->group(function () {
 
 Route::get('/logout', 'LoginController@logout');
 
+// API Settings
+Route::get('/api/settings', 'ApiSettingsController@index');
+Route::post('/api/generate-token', 'ApiSettingsController@generateToken');
+
 Route::get('/policies/privacy', 'PoliciesController@privacy');
 Route::get('/policies/terms', 'PoliciesController@terms');
 

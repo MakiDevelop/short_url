@@ -131,13 +131,18 @@
                         </li> --}}
                     {{-- </ul> --}}
                     <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
-                            @if (Auth::guard('user')->check())
+                        @if (Auth::guard('user')->check())
+                            <li class="nav-item">
+                                <a class="nav-link" href="/api/settings">API</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="/logout">登出</a>
-                            @else 
+                            </li>
+                        @else
+                            <li class="nav-item">
                                 <a class="nav-link" href="/login">登入（Google）</a>
-                            @endif
-                        </li>
+                            </li>
+                        @endif
                     </ul>
                 </div>
             </nav>
