@@ -2,6 +2,8 @@
 /public/hot
 /public/storage
 /public/image/url/*
+/public/image/
+/public/.well-known/
 /storage/*.key
 /vendor
 .env
@@ -11,3 +13,9 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+
+# Sensitive files
+SERVER_INFO.md
+*.key
+*.pem
+public/info.php
