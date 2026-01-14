@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Dependencies (will be installed in build)
+/vendor
+/node_modules
+
+# Environment files (mount at runtime)
+.env
+.env.*
+!.env.example
+
+# Storage (mount as volume)
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+
+# Testing
+/tests
+phpunit.xml
+.phpunit.result.cache
+
+# Development files
+*.md
+!readme.md
+
+# Sensitive files
+*.key
+*.pem
+SERVER_INFO.md
