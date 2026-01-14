@@ -42,6 +42,7 @@ RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
 # Configure PHP
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY docker/php/www.conf /usr/local/etc/php-fpm.d/zz-custom.conf
 
 # Configure Nginx
 COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
@@ -50,6 +51,10 @@ COPY docker/nginx/default.conf /etc/nginx/http.d/default.conf
 # Configure Supervisor
 COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+# Create log directories
+RUN mkdir -p /var/log/supervisor /var/log/nginx /var/log/php \
+    && chown -R www-data:www-data /var/log/php
+
 # Set working directory
 WORKDIR /var/www/html
 
@@ -57,8 +62,9 @@ WORKDIR /var/www/html
 COPY --from=composer /app/vendor ./vendor
 COPY . .
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
+# Clear cache and set permissions
+RUN rm -f /var/www/html/bootstrap/cache/*.php \
+    && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
 

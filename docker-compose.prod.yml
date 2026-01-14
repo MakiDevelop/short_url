@@ -1,0 +1,18 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: url-shortener-app
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./storage:/var/www/html/storage
+      - ./.env.prod:/var/www/html/.env
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./docker/nginx/default.prod.conf:/etc/nginx/http.d/default.conf:ro
+    env_file:
+      - .env.prod
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
