@@ -85,7 +85,7 @@ $(function() {
             target_id = '#url_text' + num;
 
         if ($('#collapseQRCode' + num).find('img').length == 0) {
-            var img_url = 'https://chart.googleapis.com/chart?cht=qr&chs=200x200&choe=UTF-8&chl=' + encodeURIComponent($(target_id).text());
+            var img_url = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent($(target_id).text());
             $('#collapseQRCode' + num).prepend('<img src="' + img_url + '" />');
         }
     });

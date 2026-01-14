@@ -30,7 +30,7 @@ $(function() {
                     $('#short_url').removeClass('d-none');
                     $('#url_text').text(response.short_url);
 
-                    var img_url = 'https://chart.googleapis.com/chart?cht=qr&chs=200x200&choe=UTF-8&chl=' + encodeURIComponent(response.short_url);
+                    var img_url = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(response.short_url);
                     $('#collapseQRCode').prepend('<img src="' + img_url + '" />');
                 } else {
                     if (response.err) {
