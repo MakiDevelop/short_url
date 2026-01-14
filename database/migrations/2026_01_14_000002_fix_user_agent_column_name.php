@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class FixUserAgentColumnName extends Migration
 {
@@ -13,9 +12,8 @@ class FixUserAgentColumnName extends Migration
      */
     public function up()
     {
-        Schema::table('click_log', function (Blueprint $table) {
-            $table->renameColumn('user_agenet', 'user_agent');
-        });
+        // Use CHANGE COLUMN syntax for MySQL 5.7 compatibility
+        DB::statement('ALTER TABLE click_log CHANGE COLUMN user_agenet user_agent TEXT');
     }
 
     /**
@@ -25,8 +23,6 @@ class FixUserAgentColumnName extends Migration
      */
     public function down()
     {
-        Schema::table('click_log', function (Blueprint $table) {
-            $table->renameColumn('user_agent', 'user_agenet');
-        });
+        DB::statement('ALTER TABLE click_log CHANGE COLUMN user_agent user_agenet TEXT');
     }
 }
