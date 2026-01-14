@@ -57,12 +57,13 @@ CREATE TABLE IF NOT EXISTS `click_log` (
   `referral` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `os` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `browser` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agenet` text COLLATE utf8mb4_unicode_ci,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
   `ip` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `click_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `click_log_us_id_index` (`us_id`),
-  KEY `click_log_short_url_index` (`short_url`)
+  KEY `click_log_short_url_index` (`short_url`),
+  CONSTRAINT `click_log_us_id_foreign` FOREIGN KEY (`us_id`) REFERENCES `url_shortener` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Create hash_tags table
@@ -74,7 +75,21 @@ CREATE TABLE IF NOT EXISTS `hash_tags` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `hash_tags_us_id_index` (`us_id`)
+  KEY `hash_tags_us_id_index` (`us_id`),
+  CONSTRAINT `hash_tags_us_id_foreign` FOREIGN KEY (`us_id`) REFERENCES `url_shortener` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Create failed_jobs table for queue
+CREATE TABLE IF NOT EXISTS `failed_jobs` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -3,15 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\FetchUrlMetadata;
 use App\Repositories\ClickLogRepository;
 use App\Repositories\UrlShortenerRepository;
 use App\Services\HtmlParserService;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class UrlController extends Controller
 {
+    use ApiResponse;
     protected $urlRepository;
     protected $logRepository;
     protected $htmlService;
@@ -40,10 +43,7 @@ class UrlController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors(),
-            ], 422);
+            return $this->validationErrorResponse($validator->errors()->toArray());
         }
 
         try {
@@ -52,10 +52,7 @@ class UrlController extends Controller
             if ($customCode) {
                 $existing = $this->urlRepository->getByCode($customCode);
                 if ($existing) {
-                    return response()->json([
-                        'success' => false,
-                        'error' => 'Custom code already exists',
-                    ], 409);
+                    return $this->conflictResponse('Custom code already exists');
                 }
                 $code = $customCode;
             } else {
@@ -90,16 +87,18 @@ class UrlController extends Controller
 
             $urlData = $this->urlRepository->insert($insertData);
 
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'code' => $code,
-                    'short_url' => url($code),
-                    'original_url' => $urlData->original_url,
-                    'title' => $urlData->og_title,
-                    'created_at' => $urlData->created_at,
-                ],
-            ], 201);
+            // Dispatch async job to fetch metadata if not provided
+            if (empty($request->input('title'))) {
+                FetchUrlMetadata::dispatch($urlData, $request->input('url'));
+            }
+
+            return $this->successResponse([
+                'code' => $code,
+                'short_url' => url($code),
+                'original_url' => $urlData->original_url,
+                'title' => $urlData->og_title,
+                'created_at' => $urlData->created_at,
+            ], null, 201);
 
         } catch (\Exception $e) {
             Log::error('API: URL creation failed', [
@@ -107,10 +106,7 @@ class UrlController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'error' => 'Failed to create short URL',
-            ], 500);
+            return $this->serverErrorResponse('Failed to create short URL');
         }
     }
 
@@ -123,24 +119,18 @@ class UrlController extends Controller
         $url = $this->urlRepository->getByCode($code);
 
         if (!$url) {
-            return response()->json([
-                'success' => false,
-                'error' => 'URL not found',
-            ], 404);
+            return $this->notFoundResponse('URL');
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'code' => $url->short_url,
-                'short_url' => url($url->short_url),
-                'original_url' => $url->original_url,
-                'title' => $url->og_title,
-                'description' => $url->og_description,
-                'image' => $url->og_image,
-                'clicks' => $url->clicks,
-                'created_at' => $url->created_at,
-            ],
+        return $this->successResponse([
+            'code' => $url->short_url,
+            'short_url' => url($url->short_url),
+            'original_url' => $url->original_url,
+            'title' => $url->og_title,
+            'description' => $url->og_description,
+            'image' => $url->og_image,
+            'clicks' => $url->clicks,
+            'created_at' => $url->created_at,
         ]);
     }
 
@@ -153,23 +143,17 @@ class UrlController extends Controller
         $url = $this->urlRepository->getByCode($code);
 
         if (!$url) {
-            return response()->json([
-                'success' => false,
-                'error' => 'URL not found',
-            ], 404);
+            return $this->notFoundResponse('URL');
         }
 
         $referralData = $this->logRepository->analyticsReferral($code);
         $osData = $this->logRepository->analyticsOs($code);
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'code' => $code,
-                'total_clicks' => $url->clicks,
-                'referrals' => $referralData,
-                'operating_systems' => $osData,
-            ],
+        return $this->successResponse([
+            'code' => $code,
+            'total_clicks' => $url->clicks,
+            'referrals' => $referralData,
+            'operating_systems' => $osData,
         ]);
     }
 
@@ -183,18 +167,12 @@ class UrlController extends Controller
         $url = $this->urlRepository->getByUserCode($userId, $code);
 
         if (!$url) {
-            return response()->json([
-                'success' => false,
-                'error' => 'URL not found or unauthorized',
-            ], 404);
+            return $this->notFoundResponse('URL');
         }
 
         $this->urlRepository->delete($url);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'URL deleted successfully',
-        ]);
+        return $this->successResponse(null, 'URL deleted successfully');
     }
 
     /**
@@ -206,10 +184,7 @@ class UrlController extends Controller
         $userId = $request->user()->id ?? 0;
 
         if (!$userId) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Authentication required',
-            ], 401);
+            return $this->unauthorizedResponse();
         }
 
         $params = [
@@ -219,9 +194,8 @@ class UrlController extends Controller
 
         $urls = $this->urlRepository->list($params);
 
-        return response()->json([
-            'success' => true,
-            'data' => $urls->map(function ($url) {
+        return $this->successResponse([
+            'urls' => $urls->map(function ($url) {
                 return [
                     'code' => $url->short_url,
                     'short_url' => url($url->short_url),

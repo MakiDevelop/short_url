@@ -29,5 +29,5 @@ class ClickLog extends Model
      *
      * @var array
      */
-    protected $fillable = ['us_id', 'short_url', 'referral_url', 'referral', 'os', 'browser', 'user_agenet', 'click_time', 'ip'];
+    protected $fillable = ['us_id', 'short_url', 'referral_url', 'referral', 'os', 'browser', 'user_agent', 'click_time', 'ip'];
 }

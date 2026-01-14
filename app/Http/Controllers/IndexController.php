@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\FetchUrlMetadata;
 use App\Repositories\ClickLogRepository;
 use App\Repositories\HashTagsRepository;
 use App\Repositories\UrlShortenerRepository;
@@ -63,7 +64,7 @@ class IndexController extends Controller
                 'referral'     => $referral,
                 'os'           => $os->getName(),
                 'browser'      => $browser->getName(),
-                'user_agenet'  => $request->header('User-Agent'),
+                'user_agent'   => $request->header('User-Agent'),
                 'ip'           => $request->ip(),
                 'click_time'   => date('Y-m-d H:i:s'),
             ];
@@ -172,12 +173,24 @@ class IndexController extends Controller
                         }
                     }
                 } else {
-                    $metaDatas = $this->htmlService->metaData($post['url'], config('common.metaProperty'), $code);
+                    // For anonymous users, we'll fetch metadata asynchronously
+                    $metaDatas = [
+                        'content_type'   => null,
+                        'og_title'       => null,
+                        'og_description' => null,
+                        'og_image'       => null,
+                    ];
                 }
 
                 try {
                     $insertData = array_merge($tmpData, $metaDatas);
                     $urlData    = $this->urlRepository->insert($insertData);
+
+                    // Dispatch async job to fetch metadata for anonymous users
+                    if (!Auth::guard('user')->check()) {
+                        FetchUrlMetadata::dispatch($urlData, $post['url']);
+                    }
+
                     // hash tag
                     if (Auth::guard('user')->check()) {
                         $tags = explode(',', $post['hash_tag']);
