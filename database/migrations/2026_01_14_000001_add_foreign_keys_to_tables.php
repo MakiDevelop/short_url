@@ -13,6 +13,15 @@ class AddForeignKeysToTables extends Migration
      */
     public function up()
     {
+        // First, change column types to match (unsigned)
+        Schema::table('click_log', function (Blueprint $table) {
+            $table->unsignedBigInteger('us_id')->change();
+        });
+
+        Schema::table('hash_tags', function (Blueprint $table) {
+            $table->unsignedBigInteger('us_id')->change();
+        });
+
         // Add foreign key to click_log table
         Schema::table('click_log', function (Blueprint $table) {
             $table->foreign('us_id')
