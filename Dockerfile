@@ -22,7 +22,7 @@ RUN apk add --no-cache \
     oniguruma-dev \
     icu-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
+    && docker-php-ext-install -j1 \
         pdo_mysql \
         mbstring \
         exif \
