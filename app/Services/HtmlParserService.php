@@ -29,7 +29,8 @@ class HtmlParserService
         }
 
         $response  = $this->client->request('GET', $url, $options);
-        $contentType = $response->getHeader('content-type')[0];
+        $contentTypeHeader = $response->getHeader('content-type');
+        $contentType = !empty($contentTypeHeader) ? $contentTypeHeader[0] : 'text/html';
         $html      = $response->getBody();
         try {
             $metaDatas['content_type'] = $contentType;
@@ -38,7 +39,7 @@ class HtmlParserService
                 $metaDatas['og_title'] = '';
             } else {
                 $dom = new Dom;
-                $dom->load($html);
+                $dom->loadStr($html);
                 $metas = $dom->find('meta');
                 foreach ($metas as $meta) {
                     if (in_array($meta->property, $metaProperty)) {
@@ -47,12 +48,13 @@ class HtmlParserService
                     }
                 }
                 if (empty($metaDatas['og_title'])) {
-                    $metaDatas['og_title'] = $dom->find('title')->text;
+                    $titleCollection = $dom->find('title');
+                    $metaDatas['og_title'] = $titleCollection->count() > 0 ? $titleCollection->text : '';
                 }
                 if (strpos($url, 'drive.google') !== false && empty($metaDatas['og_image'])) {
                     $metaDatas['og_image'] = 'https://www.gstatic.com/images/branding/product/1x/drive_48dp.png';
                 }
-                if (parse_url($metaDatas['og_image'], PHP_URL_SCHEME) === null) {
+                if (!empty($metaDatas['og_image']) && parse_url($metaDatas['og_image'], PHP_URL_SCHEME) === null) {
                     $metaDatas['og_image'] = 'https:' . $metaDatas['og_image'];
                 }
             }
